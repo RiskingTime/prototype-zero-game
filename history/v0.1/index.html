@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototype Zero — Encounter 001</title>
+<style>
+:root{--bg:#17191d;--panel:#22262c;--cell:#30363d;--line:#59616b;--text:#f2f4f7;--muted:#aeb6c2;--hero:#3978b8;--enemy:#a84b4b;--sel:#d6b85a;--good:#4c956c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:16px 20px;border-bottom:1px solid #333;background:#121418}h1{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px}
+main{display:grid;grid-template-columns:minmax(560px,1fr) 300px;gap:16px;padding:16px;max-width:1200px;margin:auto}
+#board{display:grid;grid-template-columns:repeat(15,1fr);gap:2px;background:#111;padding:6px;border-radius:10px}
+.cell{aspect-ratio:1;border:1px solid #454b54;background:var(--cell);color:white;border-radius:3px;font-weight:800;cursor:pointer;min-width:0}
+.cell.hero{background:var(--hero)}.cell.enemy{background:var(--enemy)}.cell.selected{outline:3px solid var(--sel);z-index:1}.cell.target{outline:2px solid #eee}
+.panel{background:var(--panel);border:1px solid #353a42;border-radius:10px;padding:14px;margin-bottom:12px}
+.panel h2{font-size:15px;margin:0 0 10px}button.action{width:100%;padding:10px;margin:4px 0;background:#343a43;color:white;border:1px solid #555d68;border-radius:7px;cursor:pointer}
+button.action:hover{background:#414954}button.action:disabled{opacity:.4;cursor:not-allowed}
+.stat{font-size:13px;line-height:1.55}.muted{color:var(--muted)}#log{height:210px;overflow:auto;font-size:12px;line-height:1.45}.turn{font-size:12px;padding:3px 0}.current{font-weight:800;color:#f0d36a}
+.legend{font-size:12px;color:var(--muted);padding:0 16px 16px;max-width:1200px;margin:auto}
+@media(max-width:850px){main{grid-template-columns:1fr;padding:10px}#board{min-width:520px}.boardwrap{overflow:auto}}
+</style>
+</head>
+<body>
+<header><h1>Prototype Zero — Encounter 001</h1><div class="sub">Playable vertical slice · v0.1 · flat 15×15 test arena</div></header>
+<main>
+<div class="boardwrap"><div id="board" aria-label="15 by 15 tactical battlefield"></div></div>
+<aside>
+<div class="panel"><h2 id="status">Encounter</h2><div id="unit" class="stat muted">Rolling initiative…</div></div>
+<div class="panel"><h2>Actions</h2>
+<button class="action" id="move">Move · 1 AP</button>
+<button class="action" id="attack">Attack</button>
+<button class="action" id="end">End Turn</button>
+<button class="action" id="restart">Restart Encounter</button>
+<div id="hint" class="stat muted" style="margin-top:8px"></div></div>
+<div class="panel"><h2>Initiative</h2><div id="initiative"></div></div>
+<div class="panel"><h2>Combat Log</h2><div id="log"></div></div>
+</aside>
+</main>
+<div class="legend">Blue = heroes · Red = enemies. Heroes: K Knight, A Archer, W Wizard, C Cleric. Enemies: H heavy melee, L light melee, B bow, X crossbow, M mage. Movement: up to 4 tiles per AP; diagonals allowed.</div>
+<script>
+(()=>{
+const board=document.querySelector('#board'), status=document.querySelector('#status'), unitBox=document.querySelector('#unit'),
+hint=document.querySelector('#hint'), log=document.querySelector('#log'), initBox=document.querySelector('#initiative');
+const base=[
+{id:'K',name:'Knight',team:'hero',x:2,y:6,hp:24,max:24,ac:15.5,mr:7.5,int:3,atk:11,dmg:[1,6],cost:1,type:'physical',range:1},
+{id:'A',name:'Archer',team:'hero',x:2,y:7,hp:18,max:18,ac:12.5,mr:9.5,int:6,atk:11,dmg:[2,6],cost:2,type:'physical',range:9},
+{id:'W',name:'Wizard',team:'hero',x:1,y:6,hp:16,max:16,ac:8.5,mr:13,int:7,atk:12,dmg:[2,6],cost:2,type:'magic',range:7},
+{id:'C',name:'Cleric',team:'hero',x:1,y:7,hp:22,max:22,ac:10.5,mr:11,int:9,atk:11,dmg:[1,8],cost:2,type:'magic',range:6},
+{id:'H1',label:'H',name:'Hammer Brute',team:'enemy',x:12,y:5,hp:24,max:24,ac:13,mr:8,int:3,atk:8,dmg:[3,8],cost:3,type:'physical',range:1},
+{id:'H2',label:'H',name:'Sword Brute',team:'enemy',x:12,y:9,hp:22,max:22,ac:13,mr:8,int:4,atk:8,dmg:[2,8],cost:2,type:'physical',range:1},
+{id:'L',name:'Light Melee',team:'enemy',x:11,y:7,hp:16,max:16,ac:12,mr:9,int:6,atk:7,dmg:[1,6],cost:1,type:'physical',range:1},
+{id:'B',name:'Bowman',team:'enemy',x:13,y:4,hp:16,max:16,ac:11,mr:9,int:5,atk:8,dmg:[2,6],cost:2,type:'physical',range:9},
+{id:'X',name:'Crossbowman',team:'enemy',x:13,y:10,hp:17,max:17,ac:12,mr:9,int:4,atk:8,dmg:[3,8],cost:3,type:'physical',range:9},
+{id:'M',name:'Enemy Mage',team:'enemy',x:13,y:7,hp:15,max:15,ac:9,mr:12,int:8,atk:10,dmg:[3,6],cost:2,type:'magic',range:7}
+];
+let units=[],order=[],turn=0,round=1,mode=null,gameOver=false;
+const die=n=>1+Math.floor(Math.random()*n);
+const dist=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
+const alive=t=>units.filter(u=>u.team===t&&u.hp>0);
+const cur=()=>order[turn];
+function note(s){let d=document.createElement('div');d.textContent=s;log.prepend(d)}
+function damage(u){let v=0;for(let i=0;i<u.dmg[0];i++)v+=die(u.dmg[1]);return v}
+function hitChance(a,t){let def=a.type==='magic'?t.mr:t.ac,need=Math.ceil(def-a.atk);need=Math.max(2,Math.min(20,need));return Math.max(5,Math.min(95,(21-need)*5))}
+function attack(a,t){if(a.ap<a.cost||dist(a,t)>a.range)return false;a.ap-=a.cost;let r=die(20),def=a.type==='magic'?t.mr:t.ac,hit=r===20||(r!==1&&r+a.atk>=def);if(hit){let d=damage(a);if(r===20)d*=2;t.hp=Math.max(0,t.hp-d);note(`${a.name} ${r===20?'CRITS':'hits'} ${t.name} for ${d} damage.`);if(!t.hp)note(`${t.name} is defeated.`)}else note(`${a.name} misses ${t.name} (d20 ${r}).`);render();return checkEnd()}
+function checkEnd(){if(!alive('enemy').length){gameOver=true;status.textContent='Victory — enemy squad defeated';render();return true}if(!alive('hero').length){gameOver=true;status.textContent='Defeat — the party has fallen';render();return true}return false}
+function rollInitiative(){order=units.filter(u=>u.hp>0);order.forEach(u=>{u.init=die(10)+u.int;u.ap=3});order.sort((a,b)=>b.init-a.init);turn=0;note(`Round ${round}: initiative rerolled.`);render();advanceAI()}
+function next(){if(gameOver)return;mode=null;turn++;while(turn<order.length&&order[turn].hp<=0)turn++;if(turn>=order.length){round++;rollInitiative();return}render();advanceAI()}
+function stepToward(a,t){let dx=Math.sign(t.x-a.x),dy=Math.sign(t.y-a.y),nx=a.x+dx,ny=a.y+dy;if(nx>=0&&nx<15&&ny>=0&&ny<15&&!units.some(u=>u.hp>0&&u.x===nx&&u.y===ny)){a.x=nx;a.y=ny}}
+function enemyTurn(){let a=cur();if(!a||a.team!=='enemy'||a.hp<=0){next();return}let safety=8;while(a.ap>0&&safety--&&!gameOver){let targets=alive('hero').sort((p,q)=>dist(a,p)-dist(a,q)),t=targets[0];if(!t)break;if(dist(a,t)<=a.range&&a.ap>=a.cost){if(attack(a,t))return}else if(a.ap>=1){for(let i=0;i<4;i++)stepToward(a,t);a.ap--;note(`${a.name} advances.`)}else break}setTimeout(next,300)}
+function advanceAI(){let a=cur();if(a&&a.team==='enemy'&&!gameOver){status.textContent=`Round ${round} · ${a.name} acting`;setTimeout(enemyTurn,350)}}
+function cellClick(x,y,u){let a=cur();if(gameOver||!a||a.team!=='hero')return;if(mode==='move'){let d=Math.max(Math.abs(a.x-x),Math.abs(a.y-y));if(!u&&a.ap>=1&&d<=4){a.x=x;a.y=y;a.ap--;note(`${a.name} moves ${d} tile${d===1?'':'s'}.`);mode=null;render()}else hint.textContent='Choose an empty tile within 4 tiles.'}else if(mode==='attack'){if(u&&u.team==='enemy'&&u.hp>0&&dist(a,u)<=a.range){hint.textContent=`Hit chance: ${hitChance(a,u)}%`;attack(a,u);mode=null}else hint.textContent='Choose an enemy in range.'}}
+function render(){board.innerHTML='';for(let y=0;y<15;y++)for(let x=0;x<15;x++){let c=document.createElement('button');c.className='cell';c.type='button';let u=units.find(q=>q.hp>0&&q.x===x&&q.y===y);if(u){c.textContent=u.label||u.id;c.classList.add(u.team);c.title=`${u.name} — ${u.hp}/${u.max} HP`;if(cur()===u)c.classList.add('selected')}c.addEventListener('click',()=>cellClick(x,y,u));board.appendChild(c)}
+let a=cur();if(a&&!gameOver){status.textContent=`Round ${round} · ${a.name}'s turn`;unitBox.innerHTML=`<b>${a.name}</b><br>HP ${a.hp}/${a.max} · AP ${a.ap}/3<br>AC ${a.ac} · MR ${a.mr}<br>Attack +${a.atk} · ${a.type}<br>Weapon action: ${a.cost} AP`;hint.textContent=a.team==='hero'?(mode==='move'?'Choose an empty tile within 4 tiles.':mode==='attack'?'Choose an enemy in range.':'Choose Move, Attack, or End Turn.'):'Enemy AI is acting.'}
+initBox.innerHTML='';order.forEach((u,i)=>{let d=document.createElement('div');d.className='turn'+(i===turn?' current':'');d.textContent=`${i===turn?'▶ ':''}${u.name} · ${u.init}${u.hp<=0?' · defeated':''}`;initBox.appendChild(d)});
+let heroTurn=a&&a.team==='hero'&&!gameOver;document.querySelector('#move').disabled=!heroTurn;document.querySelector('#attack').disabled=!heroTurn;document.querySelector('#end').disabled=!heroTurn}
+document.querySelector('#move').addEventListener('click',()=>{if(cur()?.team==='hero'){mode='move';render()}});
+document.querySelector('#attack').addEventListener('click',()=>{if(cur()?.team==='hero'){mode='attack';render()}});
+document.querySelector('#end').addEventListener('click',()=>{if(cur()?.team==='hero')next()});
+document.querySelector('#restart').addEventListener('click',start);
+function start(){units=base.map(u=>({...u,ap:3}));order=[];turn=0;round=1;mode=null;gameOver=false;log.innerHTML='';rollInitiative()}
+start();
+})();
+</script>
+</body></html>
