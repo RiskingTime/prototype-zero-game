@@ -1,6 +1,20 @@
 # Prototype Zero Changelog
 
-## v0.11 — current
+## v0.12 — current
+Focus: seeded deployment, diminishing movement, persistent dice presentation, critical defenses, action-effect roll panels, and compact combat summaries.
+
+- Added seeded formation-based deployment for heroes and enemies with guarded formation patterns.
+- Restart Encounter now reproduces terrain and starting formation; New Encounter / New Map produces a new seeded deployment.
+- Reworked movement to diminishing cumulative ranges: Knight/Cleric/Wizard 3/5/7; Archer 4/6/8; Slow 2/3/4.
+- Added distinct 1-AP, 2-AP and 3-AP movement-zone previews while preserving swamp's 2-point terrain cost.
+- Slowed attack-roll presentation and kept final results visible until the player dismisses them.
+- Added Continue / Return to Battlefield plus Enter/Space/Esc dismissal controls.
+- Defender kept natural 20 is now an automatic CRITICAL DEFENSE; simultaneous natural 20s resolve in favor of defense.
+- Updated exact hit-chance enumeration to include defensive natural-20 rules.
+- Generalized visible dice presentation to Healing Light, attack/spell damage rolls and Force Push collision damage.
+- Added compact Offense and Defense & Mobility character-sheet summaries with rich explanatory tooltips.
+
+## v0.11
 Focus: compact character sheets, class-defining secondary actions, Wizard spell-only actions, and animated opposed-roll presentation.
 
 - Removed the large Primary Attack panel from the active character-sheet layout.
