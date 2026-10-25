@@ -6,9 +6,9 @@ The project is currently in the **browser-prototype phase**. The purpose of this
 
 ## Current status
 
-- **Current playable build:** v0.6
+- **Current playable build:** v0.7
 - **Current technology:** HTML, CSS, and JavaScript
-- **Current focus:** combat mechanics, UI clarity, movement/pathfinding, action feedback, playtesting, and bug fixing
+- **Current focus:** initiative-order reliability, enemy AI turns, weapon/range consistency, transparent hit math, playtesting, and bug fixing
 - **Next technical step:** modularize the browser code as complexity grows and add repeatable regression testing
 - **Planned engine:** Godot 4
 - **Long-term target:** a Windows / Steam Deck game published through Steam
