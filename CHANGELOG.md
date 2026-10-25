@@ -1,6 +1,19 @@
 # Prototype Zero Changelog
 
-## v0.8 — current
+## v0.9 — current
+Focus: inventory/equipment interaction, dynamic gear effects, clearer hit-chance wording, and stepped movement.
+
+- Added Inventory beside Back to battlefield on the character screen.
+- Added shared party inventory with filters, sorting, hover tooltips, item details, and before/after stat comparison.
+- Items can be equipped and unequipped; replaced gear returns to inventory.
+- Two-handed weapons automatically stow the current off-hand item.
+- Equipment dynamically changes Attack, AC, MR, range, AP cost, damage, and initiative where applicable.
+- Added test alternatives including Cleric Holy Staff, armor, shields, rings, gloves, boots, and magical accessories.
+- Added usable Healing Potions.
+- Attack confirmation now reads HIT CHANCE.
+- Player and enemy movement now animates tile by tile instead of teleporting to the destination.
+
+## v0.8
 Focus: opposed attack/defense rolls and attribute-derived combat bonuses.
 
 - Replaced static attack-vs-AC/MR checks with opposed d20 attack and defense rolls.
