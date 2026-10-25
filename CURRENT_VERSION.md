@@ -1,25 +1,25 @@
-# Prototype Zero v0.6
+# Prototype Zero v0.7
 
-Focus: tactical clarity, reliable movement, readable combat outcomes, and single-screen UI discipline.
+Focus: initiative-order reliability, visible enemy turns, weapon/range consistency, and transparent hit-chance math.
 
-## Changes in v0.6
-- Friendly units can be moved through but cannot be used as movement destinations.
-- Movement paths prefer direct, human-readable routes instead of large zig-zags.
-- Enemy movement no longer logs zero-distance moves when blocked.
-- A player character automatically ends its turn when AP reaches 0.
-- Important tactical messages remain visible until the next meaningful click/action instead of disappearing on a timer.
-- Initiative is collapsed to a title-only control by default; click to expand the full order.
-- Confirm Attack now shows attacker and target details, hit-chance math, AP cost, damage dice, damage range, average damage, and critical damage range.
-- Combat log is newest-first again.
-- Combat log attack entries now include attack math, damage dice, HP before/after, and defeat causality in the same event.
-- Character-sheet Back to Battlefield control has stronger click/hover behavior.
-- Sidebar, buttons, text, and battlefield sizing are more defensive against viewport overflow, including Steam Deck-like dimensions.
+## Changes in v0.7
+- Fixed an AI pathing bug that could cause a high-initiative enemy to silently skip its turn when the nearest attack position was more than one movement action away.
+- Enemy AI now chooses a reachable tile that actually reduces distance to its target instead of searching only for target-adjacent tiles.
+- Enemy turns resolve one action at a time with battlefield/log updates between actions, so an enemy that wins initiative visibly acts before control advances to the next combatant.
+- If an enemy genuinely cannot find a legal movement path, the combat log now records that it held position rather than silently skipping.
+- Corrected the Cleric's Blessed Mace to a **physical melee attack with range 1**. The mace no longer behaves like a ranged magic attack.
+- Ranged magic for the Cleric, if retained later, should be represented as a separate spell or ability rather than being attached to the mace.
+- Enemy hover/click feedback in the **Actions** box now shows the hit-chance calculation before commitment: attack bonus, AC or MR checked, d20 roll needed, final hit chance, AP cost, and distance/range.
+- The existing Confirm Attack dialog still provides the fuller attack/damage breakdown.
 
 ## Main playtest targets
-1. Confirm that a Wizard can move straight through an allied Knight without a zig-zag detour.
-2. Confirm that 0 AP immediately advances to the next combatant.
-3. Confirm that important tactical feedback persists until the next click/action.
-4. Expand Initiative and collapse it again; collapsed state should show only "Initiative".
-5. Open Confirm Attack and verify the odds and damage breakdown are useful.
-6. Confirm defeat events in the combat log clearly show which attack caused the defeat and the HP transition.
-7. Confirm the entire combat UI stays inside one screen without horizontal or vertical page scrolling.
+1. Restart encounters until an enemy wins initiative. Confirm that the enemy visibly moves and/or attacks before the first hero turn and that its actions appear in the combat log.
+2. Confirm that the Cleric's Blessed Mace shows **Physical**, **Range 1**, and cannot attack distant enemies.
+3. Hover enemies with different characters and confirm the Actions box explains the d20 hit calculation clearly.
+4. Confirm that out-of-range enemies still show the *potential* hit chance and calculation while clearly explaining that the attack is currently illegal.
+5. Confirm that no enemy turn ends silently; if an enemy cannot move, the log should say so.
+
+## Hit-chance rule currently used
+Physical attacks roll **d20 + attack bonus vs AC**. Magical attacks roll **d20 + attack bonus vs MR**. A natural 1 always misses and a natural 20 always hits, so displayed hit chance is bounded between 5% and 95%.
+
+Combat math and class attack bonuses remain provisional while the prototype is focused on tactical clarity and interaction reliability.
