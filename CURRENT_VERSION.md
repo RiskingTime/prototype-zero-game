@@ -1,25 +1,53 @@
-# Prototype Zero v0.7
+# Prototype Zero v0.8
 
-Focus: initiative-order reliability, visible enemy turns, weapon/range consistency, and transparent hit-chance math.
+Focus: opposed attack/defense rolls and attribute-derived combat bonuses.
 
-## Changes in v0.7
-- Fixed an AI pathing bug that could cause a high-initiative enemy to silently skip its turn when the nearest attack position was more than one movement action away.
-- Enemy AI now chooses a reachable tile that actually reduces distance to its target instead of searching only for target-adjacent tiles.
-- Enemy turns resolve one action at a time with battlefield/log updates between actions, so an enemy that wins initiative visibly acts before control advances to the next combatant.
-- If an enemy genuinely cannot find a legal movement path, the combat log now records that it held position rather than silently skipping.
-- Corrected the Cleric's Blessed Mace to a **physical melee attack with range 1**. The mace no longer behaves like a ranged magic attack.
-- Ranged magic for the Cleric, if retained later, should be represented as a separate spell or ability rather than being attached to the mace.
-- Enemy hover/click feedback in the **Actions** box now shows the hit-chance calculation before commitment: attack bonus, AC or MR checked, d20 roll needed, final hit chance, AP cost, and distance/range.
-- The existing Confirm Attack dialog still provides the fuller attack/damage breakdown.
+## Core combat math change
+Attack resolution is now an opposed roll rather than a single d20 against a static target number.
+
+- Attacker rolls **d20 + Attack Bonus**.
+- Defender rolls **d20 + AC Bonus** for physical attacks or **d20 + MR Bonus** for magical attacks.
+- The attack hits only when the attack total is **greater than** the defense total; ties favor the defender.
+- An attacker natural 1 always misses.
+- An attacker natural 20 always hits and remains a critical hit.
+- The displayed pre-roll hit chance is calculated exactly across all **400 possible d20-vs-d20 roll pairs**.
+
+## Attribute-derived bonuses
+The old hard-coded +11/+12 attack values and static AC/MR target numbers are no longer used for attack resolution.
+
+### Attack Bonus
+**Ability modifier + proficiency**
+
+The 1-10 attribute scale maps directly to modifiers: score 1 = -4 through score 10 = +5 (modifier = score - 5). Current proficiency is +2 for each unit's listed primary weapon/spell.
+
+- Knight Longsword: STR 9 (+4) + proficiency +2 = **+6**
+- Archer Longbow: DEX 9 (+4) + proficiency +2 = **+6**
+- Wizard Arcane Staff: WIS 9 (+4) + proficiency +2 = **+6**
+- Cleric Blessed Mace: STR 4 (-1) + proficiency +2 = **+1**
+
+### AC Bonus (physical defense roll)
+**CON modifier + half DEX modifier + armor + shield**
+
+Secondary-attribute halves round toward zero. Current prototype equipment bonuses are intentionally simple: Plate +3, Chain Shirt +2, Leather +1, Heavy Hide +2, Robes +0, shield +1.
+
+### MR Bonus (magic defense roll)
+**WIS modifier + half INT modifier + magical equipment**
+
+The Cleric's Sun Amulet currently contributes +1 MR; other listed prototype gear contributes +0 MR unless otherwise noted.
+
+## UI/log changes
+- Actions hover now explains both sides of the opposed roll and the exact pre-roll hit chance.
+- Confirm Attack shows the attack bonus formula, defense bonus formula, tie rule, natural-roll rules, and the 400-outcome probability.
+- Character panels and sheets now show **AC roll**, **MR roll**, and attribute-derived Attack Bonus.
+- Combat log records both the attacker d20 and defender d20, their bonuses, final totals, and whether the attack was defended.
 
 ## Main playtest targets
-1. Restart encounters until an enemy wins initiative. Confirm that the enemy visibly moves and/or attacks before the first hero turn and that its actions appear in the combat log.
-2. Confirm that the Cleric's Blessed Mace shows **Physical**, **Range 1**, and cannot attack distant enemies.
-3. Hover enemies with different characters and confirm the Actions box explains the d20 hit calculation clearly.
-4. Confirm that out-of-range enemies still show the *potential* hit chance and calculation while clearly explaining that the attack is currently illegal.
-5. Confirm that no enemy turn ends silently; if an enemy cannot move, the log should say so.
+1. Compare hit chances across different physical and magical matchups. 95% should now be exceptional rather than routine.
+2. Confirm that the Wizard is strong against magically weak opponents but less reliable against the Enemy Mage.
+3. Confirm that the Knight is difficult to hit physically but vulnerable to magic.
+4. Confirm that the Cleric's low-STR Blessed Mace has appropriately modest hit chances.
+5. Expand attack log entries and confirm the opposed-roll math is understandable after resolution.
+6. Check whether two-die combat feels exciting and readable or excessively swingy.
 
-## Hit-chance rule currently used
-Physical attacks roll **d20 + attack bonus vs AC**. Magical attacks roll **d20 + attack bonus vs MR**. A natural 1 always misses and a natural 20 always hits, so displayed hit chance is bounded between 5% and 95%.
-
-Combat math and class attack bonuses remain provisional while the prototype is focused on tactical clarity and interaction reliability.
+## Still provisional
+The exact proficiency, armor, shield, and magical-equipment bonuses are balance-test values. Cover, elevation, buffs/debuffs, class abilities, and future equipment can later modify the attack or defense side of the opposed roll.
