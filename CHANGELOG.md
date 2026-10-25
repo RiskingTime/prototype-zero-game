@@ -1,6 +1,20 @@
 # Prototype Zero Changelog
 
-## v0.10 — current
+## v0.11 — current
+Focus: compact character sheets, class-defining secondary actions, Wizard spell-only actions, and animated opposed-roll presentation.
+
+- Removed the large Primary Attack panel from the active character-sheet layout.
+- Expanded Main Hand tooltips with attack profile and AC/MR context.
+- Added compact Position & Mobility and Class Features & Status panels.
+- Added Archer Fortify Position (1 AP): prepare Advantage for the first physical ranged Basic Attack on the following turn; movement breaks the benefit.
+- Added Knight Brace (2 AP), available only with a shield: Advantage on physical-defense rolls until the Knight's next turn.
+- Removed the Wizard's generic Basic Attack. The Wizard action bar is now defined by the four prepared spells.
+- Arcane Staff remains a spell focus and no longer implies a separate Wizard Basic Attack action.
+- Added an animated roll-resolution overlay for every opposed hero and enemy attack.
+- Normal rolls show one d20; Advantage/Disadvantage show two d20s with the kept die highlighted.
+- Roll presentation exposes attack/defense modifiers, roll-mode sources, totals, hit chance and HIT / DEFENDED / CRITICAL outcomes.
+
+## v0.10
 Focus: prepared spells, advantage/disadvantage, directional cover/LOS, and seeded procedural battlefields.
 
 - Expanded rich hover tooltips across character stats, equipment, spells, battlefield units, terrain and attack previews.
