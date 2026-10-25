@@ -1,53 +1,38 @@
-# Prototype Zero v0.8
+# Prototype Zero v0.9
 
-Focus: opposed attack/defense rolls and attribute-derived combat bonuses.
+Focus: character inventory, interactive equipment, dynamic derived stats, clearer hit-chance wording, and stepped movement.
 
-## Core combat math change
-Attack resolution is now an opposed roll rather than a single d20 against a static target number.
+## Changes in v0.9
+- Added an **Inventory** button beside **Back to battlefield** on the character screen.
+- Character and Inventory views share the same eight equipment slots: Main Hand, Off Hand, Armor, Amulet, Helm, Gloves, Boots, and Ring.
+- Added a party inventory grid with filters for All, Weapons, Armor, Accessories, and Consumables plus sorting by name, type, or slot.
+- Inventory items and equipped slots show hover tooltips explaining type, slot, combat effects, and purpose.
+- Clicking an inventory item opens a detail panel with its effects and a **current -> after equip** comparison for Attack, AC, MR, and initiative gear bonus where relevant.
+- Items can be equipped and unequipped. Replaced equipment returns to party inventory. Two-handed weapons automatically stow the current off-hand item.
+- Equipment now changes combat statistics dynamically. Test items include alternative weapons, armor, shields, magical accessories, attack gloves, initiative boots, and rings.
+- Added a usable Healing Potion consumable that restores up to 6 HP.
+- The Cleric can test a Holy Staff alternative that switches the primary attack from the STR-based Blessed Mace to an INT-based ranged magical attack.
+- The Wizard's Arcane Staff now demonstrates a +1 equipment Attack Bonus.
+- Attack confirmation now says **HIT CHANCE** rather than simply **HIT**.
+- Player and enemy movement now animates one tile at a time along the chosen path rather than teleporting directly to the destination.
 
-- Attacker rolls **d20 + Attack Bonus**.
-- Defender rolls **d20 + AC Bonus** for physical attacks or **d20 + MR Bonus** for magical attacks.
-- The attack hits only when the attack total is **greater than** the defense total; ties favor the defender.
-- An attacker natural 1 always misses.
-- An attacker natural 20 always hits and remains a critical hit.
-- The displayed pre-roll hit chance is calculated exactly across all **400 possible d20-vs-d20 roll pairs**.
+## Inventory UI test targets
+1. Open a hero character sheet and switch between **Character** and **Inventory**.
+2. Hover inventory items and equipped slots. Confirm the tooltips are readable and useful.
+3. Equip and unequip several items. Confirm Attack, AC, MR, range, AP cost, damage, and/or initiative change when the gear says they should.
+4. Equip a two-handed weapon while holding a shield and confirm the shield is returned to inventory.
+5. Test the Cleric's Blessed Mace vs Holy Staff to confirm the primary attack meaningfully changes.
+6. Use a Healing Potion after taking damage.
+7. Test filters and sorting.
 
-## Attribute-derived bonuses
-The old hard-coded +11/+12 attack values and static AC/MR target numbers are no longer used for attack resolution.
+## Movement test targets
+1. Move a hero several tiles and confirm every tile step is visible.
+2. Watch enemy movement and confirm the same stepped presentation is used.
+3. Confirm AP is still charged once for the complete movement action and the combat log records the full path.
+4. Confirm movement animation does not allow accidental input during the animation.
 
-### Attack Bonus
-**Ability modifier + proficiency**
-
-The 1-10 attribute scale maps directly to modifiers: score 1 = -4 through score 10 = +5 (modifier = score - 5). Current proficiency is +2 for each unit's listed primary weapon/spell.
-
-- Knight Longsword: STR 9 (+4) + proficiency +2 = **+6**
-- Archer Longbow: DEX 9 (+4) + proficiency +2 = **+6**
-- Wizard Arcane Staff: WIS 9 (+4) + proficiency +2 = **+6**
-- Cleric Blessed Mace: STR 4 (-1) + proficiency +2 = **+1**
-
-### AC Bonus (physical defense roll)
-**CON modifier + half DEX modifier + armor + shield**
-
-Secondary-attribute halves round toward zero. Current prototype equipment bonuses are intentionally simple: Plate +3, Chain Shirt +2, Leather +1, Heavy Hide +2, Robes +0, shield +1.
-
-### MR Bonus (magic defense roll)
-**WIS modifier + half INT modifier + magical equipment**
-
-The Cleric's Sun Amulet currently contributes +1 MR; other listed prototype gear contributes +0 MR unless otherwise noted.
-
-## UI/log changes
-- Actions hover now explains both sides of the opposed roll and the exact pre-roll hit chance.
-- Confirm Attack shows the attack bonus formula, defense bonus formula, tie rule, natural-roll rules, and the 400-outcome probability.
-- Character panels and sheets now show **AC roll**, **MR roll**, and attribute-derived Attack Bonus.
-- Combat log records both the attacker d20 and defender d20, their bonuses, final totals, and whether the attack was defended.
-
-## Main playtest targets
-1. Compare hit chances across different physical and magical matchups. 95% should now be exceptional rather than routine.
-2. Confirm that the Wizard is strong against magically weak opponents but less reliable against the Enemy Mage.
-3. Confirm that the Knight is difficult to hit physically but vulnerable to magic.
-4. Confirm that the Cleric's low-STR Blessed Mace has appropriately modest hit chances.
-5. Expand attack log entries and confirm the opposed-roll math is understandable after resolution.
-6. Check whether two-die combat feels exciting and readable or excessively swingy.
-
-## Still provisional
-The exact proficiency, armor, shield, and magical-equipment bonuses are balance-test values. Cover, elevation, buffs/debuffs, class abilities, and future equipment can later modify the attack or defense side of the opposed roll.
+## Known prototype limits
+- Inventory icons are temporary symbolic icons rather than final art.
+- Inventory is currently shared party inventory; encumbrance, gold/value, stack splitting, drag-and-drop, loot pickup, and persistent save/load are not implemented yet.
+- Class proficiency restrictions are intentionally simple and will need broader design work as the item catalogue grows.
+- Equipment balance values are for testing UI and build trade-offs, not final balance.
