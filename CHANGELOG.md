@@ -1,6 +1,19 @@
 # Prototype Zero Changelog
 
-## v0.7 — current
+## v0.8 — current
+Focus: opposed attack/defense rolls and attribute-derived combat bonuses.
+
+- Replaced static attack-vs-AC/MR checks with opposed d20 attack and defense rolls.
+- Attack hits only when attack total exceeds defense total; ties defend.
+- Attacker natural 1 always misses; natural 20 always hits and critically hits.
+- Hit chance is calculated exactly across all 400 possible d20-vs-d20 outcomes.
+- Attack Bonus now derives from the relevant ability modifier plus proficiency.
+- AC Bonus derives from CON, half DEX, armor, and shield.
+- MR Bonus derives from WIS, half INT, and magical equipment.
+- Character panels, attack previews, confirmation dialog, and combat log now expose the full opposed-roll math.
+- The old hard-coded +11/+12 attack values and static AC/MR target numbers are no longer used for hit resolution.
+
+## v0.7
 Focus: initiative-order reliability, visible enemy turns, weapon/range consistency, and transparent hit-chance math.
 
 - Fixed AI pathing that could cause high-initiative enemies to silently skip their turns.
