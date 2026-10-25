@@ -1,6 +1,21 @@
 # Prototype Zero Changelog
 
-## v0.9 — current
+## v0.10 — current
+Focus: prepared spells, advantage/disadvantage, directional cover/LOS, and seeded procedural battlefields.
+
+- Expanded rich hover tooltips across character stats, equipment, spells, battlefield units, terrain and attack previews.
+- Added reusable advantage/disadvantage roll modes (2d20 keep high / low) with cancellation.
+- Physical ranged weapons suffer disadvantage while a hostile unit is adjacent.
+- Soft cover gives defender advantage; hard cover gives defender advantage plus attacker disadvantage.
+- Cover is directional and can be defeated by flanking; non-adjacent trees/rocks can block line of sight.
+- Added Cleric Healing Light (1 AP, 1d6 + INT, range 5, once per turn).
+- Added Wizard Arcane Dart, Arcane Bolt, Arcane Lance, Force Push, Slow and Blur.
+- Added reusable spell scrolls, a Spells inventory filter and prepared-spell slots (Wizard 4, Cleric 2).
+- Added five seeded procedural map archetypes: Woodland Clearing, Rocky Courtyard, Marsh, River Crossing and Ruined Supply Yard.
+- Added water, swamp, trees, rocks and barrels/crates with movement/cover identities.
+- Restart Encounter keeps the same map seed; New Encounter / New Map generates a new archetype and seed.
+
+## v0.9
 Focus: inventory/equipment interaction, dynamic gear effects, clearer hit-chance wording, and stepped movement.
 
 - Added Inventory beside Back to battlefield on the character screen.
