@@ -6,9 +6,9 @@ The project is currently in the **browser-prototype phase**. The purpose of this
 
 ## Current status
 
-- **Current playable build:** v0.11
+- **Current playable build:** v0.12
 - **Current technology:** HTML, CSS, and JavaScript
-- **Current focus:** compact character sheets, Archer/Knight class techniques, Wizard prepared-spell-only actions, animated opposed-roll presentation, playtesting, and bug fixing
+- **Current focus:** seeded deployment, diminishing movement, persistent dice presentation, critical defenses, action-effect roll panels, compact combat summaries, playtesting, and bug fixing
 - **Next technical step:** modularize the browser code as complexity grows and add repeatable regression testing
 - **Planned engine:** Godot 4
 - **Long-term target:** a Windows / Steam Deck game published through Steam
