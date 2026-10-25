@@ -1,38 +1,86 @@
-# Prototype Zero v0.9
+# Prototype Zero v0.10
 
-Focus: character inventory, interactive equipment, dynamic derived stats, clearer hit-chance wording, and stepped movement.
+Focus: tactical variety — rich hover information, advantage/disadvantage, prepared spells, directional cover/line of sight, and seeded procedural battlefields.
 
-## Changes in v0.9
-- Added an **Inventory** button beside **Back to battlefield** on the character screen.
-- Character and Inventory views share the same eight equipment slots: Main Hand, Off Hand, Armor, Amulet, Helm, Gloves, Boots, and Ring.
-- Added a party inventory grid with filters for All, Weapons, Armor, Accessories, and Consumables plus sorting by name, type, or slot.
-- Inventory items and equipped slots show hover tooltips explaining type, slot, combat effects, and purpose.
-- Clicking an inventory item opens a detail panel with its effects and a **current -> after equip** comparison for Attack, AC, MR, and initiative gear bonus where relevant.
-- Items can be equipped and unequipped. Replaced equipment returns to party inventory. Two-handed weapons automatically stow the current off-hand item.
-- Equipment now changes combat statistics dynamically. Test items include alternative weapons, armor, shields, magical accessories, attack gloves, initiative boots, and rings.
-- Added a usable Healing Potion consumable that restores up to 6 HP.
-- The Cleric can test a Holy Staff alternative that switches the primary attack from the STR-based Blessed Mace to an INT-based ranged magical attack.
-- The Wizard's Arcane Staff now demonstrates a +1 equipment Attack Bonus.
-- Attack confirmation now says **HIT CHANCE** rather than simply **HIT**.
-- Player and enemy movement now animates one tile at a time along the chosen path rather than teleporting directly to the destination.
+## Major changes
 
-## Inventory UI test targets
-1. Open a hero character sheet and switch between **Character** and **Inventory**.
-2. Hover inventory items and equipped slots. Confirm the tooltips are readable and useful.
-3. Equip and unequip several items. Confirm Attack, AC, MR, range, AP cost, damage, and/or initiative change when the gear says they should.
-4. Equip a two-handed weapon while holding a shield and confirm the shield is returned to inventory.
-5. Test the Cleric's Blessed Mace vs Holy Staff to confirm the primary attack meaningfully changes.
-6. Use a Healing Potion after taking damage.
-7. Test filters and sorting.
+### Rich tactical tooltips
+- Character-sheet attributes, HP, AC, MR, Attack, Initiative, equipment and spells use the same shaded hover-tooltip language introduced for inventory items.
+- Battlefield unit hover now shows HP, defenses, equipped attack, selected action/spell, range/AP, exact hit chance, roll modes, cover, status effects and targeting restrictions.
+- Terrain tiles have tooltips explaining movement and cover behavior.
 
-## Movement test targets
-1. Move a hero several tiles and confirm every tile step is visible.
-2. Watch enemy movement and confirm the same stepped presentation is used.
-3. Confirm AP is still charged once for the complete movement action and the combat log records the full path.
-4. Confirm movement animation does not allow accidental input during the animation.
+### Advantage / disadvantage
+- Normal: roll 1d20.
+- Advantage: roll 2d20 and keep the higher result.
+- Disadvantage: roll 2d20 and keep the lower result.
+- Advantage and disadvantage cancel one another; multiple sources do not add more dice.
+- Physical ranged weapon attacks have disadvantage whenever any hostile unit is adjacent.
+- Exact hit chance accounts for both attacker and defender roll modes.
 
-## Known prototype limits
-- Inventory icons are temporary symbolic icons rather than final art.
-- Inventory is currently shared party inventory; encumbrance, gold/value, stack splitting, drag-and-drop, loot pickup, and persistent save/load are not implemented yet.
-- Class proficiency restrictions are intentionally simple and will need broader design work as the item catalogue grows.
-- Equipment balance values are for testing UI and build trade-offs, not final balance.
+### Cover, flanking and line of sight
+- Soft cover: defender has advantage.
+- Hard cover: defender has advantage and attacker has disadvantage. This is intentionally very strong.
+- Cover is directional: it applies only when the cover object is in the adjacent tile between defender and attacker.
+- Moving to another angle can remove cover.
+- Trees and rocks farther along the attack line can block line of sight entirely.
+
+### Cleric spell
+- **Healing Light** — 1 AP, range 5, heals `1d6 + INT modifier`, no attack roll, once per turn.
+- Cleric uses the same prepared-spell architecture as the Wizard and currently has 2 prepared slots.
+
+### Wizard spells and preparation
+Wizard currently has 4 prepared-spell slots and 6 reusable prototype spell scrolls:
+
+- **Arcane Dart** — 1 AP, range 6, 1d6 magic damage.
+- **Arcane Bolt** — 2 AP, range 7, 2d6 magic damage.
+- **Arcane Lance** — 3 AP, range 8, 4d6 magic damage.
+- **Force Push** — 2 AP, range 5, push up to 5 tiles; collision with terrain/unit/map edge deals 1d6 damage.
+- **Slow** — 2 AP, range 6, target moves 2 tiles/AP through its next turn.
+- **Blur** — 1 AP, self; attacks against the Wizard have disadvantage until the Wizard's next turn.
+
+Spell scrolls appear under the new **Spells** inventory filter. They can be prepared/unprepared but are not consumed in this prototype.
+
+### Seeded procedural maps
+New Encounter / New Map chooses a new seed and one of five archetypes:
+
+1. Woodland Clearing
+2. Rocky Courtyard
+3. Marsh
+4. River Crossing
+5. Ruined Supply Yard
+
+Terrain generation is feature-based and validated for connectivity rather than assigning every tile independently at random.
+
+Terrain rules:
+- Ground: 1 movement point.
+- Swamp: 2 movement points.
+- Water: impassable.
+- Tree: impassable, soft cover.
+- Rock: impassable, hard cover.
+- Barrels / crates: impassable, soft cover.
+
+**Restart Encounter** preserves the current archetype and seed. **New Encounter / New Map** generates another archetype/seed. The active archetype and seed are displayed in the header for reproducible playtests.
+
+## Primary v0.10 playtest targets
+
+1. Does hard cover feel intentionally powerful without making fights stagnant?
+2. Is directional cover easy to understand, and does flanking reliably remove it?
+3. Does line-of-sight blocking behave as expected?
+4. Does adjacent-enemy disadvantage make bows/crossbows meaningfully vulnerable in melee?
+5. Do 1/2/3-AP Wizard damage spells create interesting action-economy tradeoffs?
+6. Are Force Push, Slow and Blur tactically distinct and useful?
+7. Is Healing Light useful without dominating the Cleric's turn?
+8. Is preparing 4 of 6 Wizard spells a meaningful loadout choice?
+9. Are the five map archetypes readable, fair and sufficiently different?
+10. Do Restart Encounter and visible seeds make problem maps reproducible?
+11. Are the richer hover tooltips informative without becoming overwhelming?
+
+## Known prototype limitations
+
+- Terrain uses simple symbols/colors rather than final art.
+- Elevation is not yet procedurally generated.
+- Enemy AI understands pathfinding around terrain but does not yet make sophisticated cover/flanking decisions.
+- Spell scrolls are reusable loadout objects rather than one-use consumables.
+- Mana, spell slots/charges, cooldowns and broader spell-resource systems are intentionally deferred.
+- High-ground combat effects are not implemented in this build.
+- Cover geometry uses a deliberately simple directional rule for testing and will need further refinement as maps become more complex.
