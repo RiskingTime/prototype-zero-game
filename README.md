@@ -6,9 +6,9 @@ The project is currently in the **browser-prototype phase**. The purpose of this
 
 ## Current status
 
-- **Current playable build:** v0.9
+- **Current playable build:** v0.10
 - **Current technology:** HTML, CSS, and JavaScript
-- **Current focus:** interactive inventory/equipment, dynamic gear effects, stepped movement, UI clarity, playtesting, and bug fixing
+- **Current focus:** prepared spells, advantage/disadvantage, directional cover and line of sight, seeded procedural maps, tactical tooltips, playtesting, and bug fixing
 - **Next technical step:** modularize the browser code as complexity grows and add repeatable regression testing
 - **Planned engine:** Godot 4
 - **Long-term target:** a Windows / Steam Deck game published through Steam
