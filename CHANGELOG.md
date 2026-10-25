@@ -1,6 +1,17 @@
 # Prototype Zero Changelog
 
-## v0.6 — current
+## v0.7 — current
+Focus: initiative-order reliability, visible enemy turns, weapon/range consistency, and transparent hit-chance math.
+
+- Fixed AI pathing that could cause high-initiative enemies to silently skip their turns.
+- Enemy AI now moves to reachable tiles that actually reduce distance to its target.
+- Enemy turns resolve one action at a time with visible battlefield and combat-log updates.
+- Genuine no-path situations are now logged instead of silently skipped.
+- Cleric's Blessed Mace is now a physical melee attack with range 1.
+- Enemy hover/click feedback in the Actions box now shows attack bonus, AC/MR, required d20 roll, final hit chance, AP cost, and range/distance.
+- Confirm Attack continues to show the fuller attack and damage breakdown.
+
+## v0.6
 Focus: tactical clarity, reliable movement, readable combat outcomes, and single-screen UI discipline.
 
 - Friendly units can be moved through but cannot be movement destinations.
