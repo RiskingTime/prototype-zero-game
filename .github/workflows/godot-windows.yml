@@ -1,0 +1,73 @@
+name: Godot Windows Alpha Build
+
+on:
+  push:
+    branches:
+      - main
+      - godot-*
+    paths:
+      - "godot/**"
+      - ".github/workflows/godot-windows.yml"
+  pull_request:
+    paths:
+      - "godot/**"
+      - ".github/workflows/godot-windows.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build:
+    name: Import, smoke test, and export Windows
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.7.2
+    env:
+      GODOT_VERSION: "4.7.2"
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Godot and Windows export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/share/godot/export_templates" "$HOME/.config"
+          cp -a "/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable" "$HOME/.local/share/godot/export_templates/"
+          if [ -d /root/.config/godot ]; then cp -a /root/.config/godot "$HOME/.config/"; fi
+          godot --version
+
+      - name: Import and validate Godot project
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path godot --editor --import
+
+      - name: Run battlefield smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path godot --script res://tests/smoke_test.gd
+
+      - name: Export Windows game and package ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/windows
+          EXPORT_PATH="$(pwd)/build/windows/PrototypeZero.exe"
+          godot --headless --path godot --export-release "Windows Desktop" "$EXPORT_PATH"
+          test -s build/windows/PrototypeZero.exe
+          test -s build/windows/PrototypeZero.pck
+          cp godot/README-PLAYTEST.md build/windows/README-PLAYTEST.md
+          printf 'Prototype Zero Godot Alpha 0.1\nGit commit: %s\nGodot version: %s\nEngineering build, not an official release.\n' "$GITHUB_SHA" "$GODOT_VERSION" > build/windows/BUILD.txt
+          (cd build/windows && zip -q -9 -r ../PrototypeZero-Godot-Alpha-0.1-Windows.zip .)
+          test -s build/PrototypeZero-Godot-Alpha-0.1-Windows.zip
+
+      - name: Upload Windows test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrototypeZero-Godot-Alpha-0.1-Windows
+          path: build/PrototypeZero-Godot-Alpha-0.1-Windows.zip
+          retention-days: 30
+          if-no-files-found: error
