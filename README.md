@@ -6,9 +6,9 @@ The project is currently in the **browser-prototype phase**. The purpose of this
 
 ## Current status
 
-- **Current playable build:** v0.12
+- **Current playable build:** v0.13
 - **Current technology:** HTML, CSS, and JavaScript
-- **Current focus:** seeded deployment, diminishing movement, persistent dice presentation, critical defenses, action-effect roll panels, compact combat summaries, playtesting, and bug fixing
+- **Current focus:** combat clarity, visible zones of control and reactions, unified resolution, tactical enemy AI, end-of-encounter telemetry, equipment trade-offs, playtesting, and preparation for the Godot vertical slice.
 - **Next technical step:** modularize the browser code as complexity grows and add repeatable regression testing
 - **Planned engine:** Godot 4
 - **Long-term target:** a Windows / Steam Deck game published through Steam
