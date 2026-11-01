@@ -23,7 +23,39 @@ For each meaningful browser release:
 5. Update `CHANGELOG.md` and the version-specific README.
 6. Commit the release to GitHub.
 7. Place the packaged playable build and version notes in the project's Google Drive Game Versions folder.
-8. Record new playtest observations in the Playtest & Feedback Log.
+8. Verify that the GitHub release contents and Google Drive release package match the intended version.
+9. Send the release-completion email described below from `james@markdalemanagement.com` to `james@markdalemanagement.com` and `JeremyRMulder@gmail.com`.
+10. Record new playtest observations in the Playtest & Feedback Log.
+
+A release is not complete until the GitHub version, Drive package, release notes, and release-completion email have all been completed and verified.
+
+## Release-completion email
+
+Every released game version should generate a concise release-completion email in the same style as the release summary provided in chat.
+
+**Sender:** `james@markdalemanagement.com`
+
+**Recipients:**
+- `james@markdalemanagement.com`
+- `JeremyRMulder@gmail.com`
+
+**Subject format:**
+
+`Prototype Zero vX.Y — <Release Title> is complete`
+
+**Body format:**
+- Open with a one-line statement that the release is complete.
+- Summarize the material gameplay, UI, AI, systems, or technical changes in clear bullets or short sections.
+- Include the primary playtest targets and any important known prototype limitations when they are relevant to the release.
+- Include direct links to the Google Drive playable HTML, release notes, and packaged ZIP, plus the relevant GitHub source/release location when available.
+- Keep the email readable enough that a collaborator can understand what changed without opening the attachments first.
+
+**Attachments:**
+- the current playable HTML build
+- the version-specific release notes / README
+- the packaged playable ZIP
+
+Send the notification only after the GitHub and Google Drive release artifacts have been verified. The email notification is part of the release definition of done for all future Prototype Zero game versions.
 
 ## Browser-stage exit criteria
 
