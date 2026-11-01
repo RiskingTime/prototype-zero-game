@@ -1,66 +1,82 @@
-# Prototype Zero v0.12
+# Prototype Zero v0.13 — Combat Clarity & Tactical AI
 
-Focus: varied encounter openings, tighter movement, slower/persistent dice presentation, critical defenses, universal action-roll presentation, and a clearer character combat summary.
+v0.13 is the browser prototype's major combat-readability and tactical-AI pass. It implements the v0.12 playtest feedback items 57–67 and is intended to prove the combat framework before the project transitions toward a Godot vertical slice.
 
 ## What changed
 
-### 1. Seeded randomized deployment
-- Heroes and enemies no longer use one fixed formation.
-- Each encounter seed selects a guarded formation and vertical deployment anchor.
-- Party front-line roles (Knight/Cleric) and rear-line roles (Archer/Wizard) stay clustered sensibly.
-- Enemy melee and ranged roles are likewise grouped rather than scattered randomly.
-- Restart Encounter reproduces the same deployment for the same seed.
-- New Encounter / New Map generates a new seed and therefore a new formation.
+### Action labels and confirmations
+- Generic **Basic Attack** buttons are replaced by the equipped attack source: e.g. **Mace Attack**, **Longsword Attack**, and **Longbow Attack**.
+- Wizard actions continue to use prepared spell names directly.
+- Healing/support confirmations are action-aware. Healing Light uses **Cast Healing Light** with a blue primary control rather than an offensive Confirm Attack treatment.
 
-### 2. Tighter diminishing movement
-- Knight, Cleric and Wizard cumulative open-ground movement: **3 / 5 / 7** movement points for 1 / 2 / 3 AP committed to movement.
-- Archer cumulative open-ground movement: **4 / 6 / 8**.
-- Later movement AP therefore add less distance than the first.
-- Slow now uses a reduced **2 / 3 / 4** cumulative movement profile.
-- Swamp still costs 2 movement points per tile.
-- Legal destination cells now distinguish 1-AP, 2-AP and 3-AP movement zones.
-- Movement previews show the active movement profile and resulting AP cost.
+### Zones of control and Opportunity Attacks
+- Entering a tile adjacent to an enemy is safe.
+- Once a unit is already adjacent to a hostile, further voluntary movement can provoke that hostile's Opportunity Attack.
+- Each unit has one reaction per round; the reaction costs 0 AP.
+- Forced movement remains exempt.
+- **Disengage** is available to an engaged hero for 1 AP and prevents Opportunity Attacks from voluntary movement for the rest of that turn.
+- Path previews flag the exact provoking step, show relevant hostile zones of control, and identify likely reacting enemies.
+- Clicking a provoking path opens one consolidated **Opportunity Attack Warning** with approximate reaction hit chances before movement is committed.
+- Opportunity Attacks use the same opposed-roll presentation as ordinary combat and carry a clear REACTION label.
 
-### 3. Slower roll presentation that waits for the player
-- Opposed attack/defense rolls now have a longer anticipation pause and slower dice animation.
-- The final result remains on screen until the player presses **Continue / Return to Battlefield**.
-- Enter, Space or Esc can also dismiss the completed roll panel.
-- Enemy attacks use the same player-controlled pacing.
+### Tactical previews before commitment
+- Movement hover information now includes AP cost, AP remaining, movement points, destination terrain cost, engagement state, stance-breaking consequences, and Opportunity Attack risk.
+- Attack previews continue to expose AP cost, exact hit chance, roll mode and causes, defense type, cover/LOS consequences, and damage profile.
+- The goal is that important tactical consequences are visible before the player commits.
 
-### 4. Defender natural 20 = critical defense
-- A kept defender natural 20 automatically defeats the attack regardless of totals.
-- If both attacker and defender keep natural 20s, defense wins.
-- Exact pre-roll hit chances use the same rule.
-- The roll panel and combat log identify the result as **CRITICAL DEFENSE**.
+### Unified combat-resolution presentation
+- Successful attacks now resolve as one continuous sequence:
+  **Attack Roll → Defense Roll → HIT/CRITICAL → Damage Roll → final damage/HP result**.
+- There is no intermediate Continue click between the hit result and damage.
+- The completed attack/defense result stays visible while the damage section appears in the same dialog.
+- Continue / Return to Battlefield appears only after the entire action finishes.
+- Healing, collision damage, deterministic effects, and Opportunity Attacks use the same core resolution vocabulary and presentation language.
 
-### 5. Dice presentation for healing, damage and collision rolls
-- Healing Light now visibly rolls its d6 and shows the Cleric's INT modifier.
-- Successful weapon/spell attacks now visibly roll their damage dice after the hit roll.
-- Force Push collision damage now visibly rolls its d6.
-- These effect-roll panels also remain visible until the player dismisses them.
-- Deterministic actions still resolve without a dice overlay.
+### Tactical enemy AI
+- Enemy decisions now use a lightweight tactical scoring system rather than simple nearest-target pursuit.
+- The scorer considers expected attack value, kill opportunities, target vulnerability, useful range, cover/safety, threatened-ranged penalties, Opportunity Attack risk, AP efficiency, and role.
+- Melee enemies value engagement and pressure on vulnerable back-line heroes.
+- Ranged enemies prefer useful distance and avoid unnecessary engagement.
+- Enemy decisions can deliberately accept reaction risk when the expected payoff justifies it.
+- Important enemy choices leave a short **AI reason** in the combat log to make browser playtesting auditable.
 
-### 6. BG3-style combat summary on the character sheet
-- The two compact lower panels now summarize **Offense** and **Defense & Mobility**.
-- Offense adapts to the current class/loadout: melee or ranged damage + attack bonus, Wizard prepared spell damage + spell attack, and Cleric Healing Light when prepared.
-- Defense & Mobility shows HP, AC Bonus, MR Bonus, movement profile and initiative bonus.
-- Each summary row keeps rich hover explanations for formulas and underlying mechanics.
+### End-of-encounter playtest summary
+- Victory/defeat now opens an encounter summary with map archetype, seed, rounds, party damage, hit rate, healing, and reaction use.
+- A per-character table summarizes damage, healing, hits/attacks, damage taken, kills, movement AP, and reactions.
+- A rules-based **Tactical Notes** section highlights playtest patterns such as repeated engagement, low-percentage attacks, repeated hard-cover attacks, healing reliance, unused Brace, or provoked reactions.
+- Controls allow Restart Same Encounter, New Encounter, or returning to the combat log.
 
-## Recommended v0.12 playtest
+### Character teaching and equipment comparison
+- Each hero now has a one-line tactical identity on the character sheet and battlefield inspection.
+- Equipment comparisons emphasize changed values rather than unchanged clutter.
+- Comparisons call out attack name, damage, AP cost, range, attack/defense changes, hand occupancy, and gained/lost class actions.
+- A short **Tactical consequence** sentence explains the practical trade-off.
+- Prepared-spell comparison similarly calls out the action gained or lost from the combat bar.
 
-1. Restart an encounter and confirm the same seed produces the same deployment; create a New Encounter and confirm formation changes.
-2. Test the 3/5/7 and 4/6/8 movement bands, including moving more than once in the same turn and moving after spending AP on an attack.
-3. Test swamp and Slow under the new movement economy.
-4. Watch several player and enemy attacks. Check whether the slower pacing now creates anticipation without feeling excessive.
-5. Confirm the resolved roll panel remains visible until Continue is chosen.
-6. Look for a defender natural 20 and confirm it produces CRITICAL DEFENSE even if the attacker has the higher total.
-7. Cast Healing Light and confirm its d6 is visibly rolled.
-8. Land a weapon/spell attack and confirm damage dice appear as a second visible roll.
-9. Review each class's character page and confirm the compact combat summary makes the build easy to read without scrolling.
+## Rules preserved from v0.12
+- 3 AP turns with diminishing movement: Knight/Cleric/Wizard 3/5/7; Archer 4/6/8; Slow 2/3/4.
+- Swamp costs 2 movement points per tile.
+- Physical ranged weapon attacks suffer Disadvantage while the attacker is threatened by an adjacent enemy.
+- Fortify Advantage can cancel threatened-ranged Disadvantage.
+- Soft cover gives the defender Advantage; hard cover gives attacker Disadvantage plus defender Advantage.
+- Defender natural 20 is an automatic Critical Defense; simultaneous kept natural 20s resolve in favor of defense.
+- Seeded maps and seeded guarded deployment remain reproducible with Restart Encounter.
 
-## Known prototype limitations
+## Primary v0.13 playtest targets
+1. Do Opportunity Attack warnings make zones of control understandable before movement?
+2. Does entering adjacency feel fair while subsequent movement feels meaningfully constrained?
+3. Does Disengage create a useful AP trade-off?
+4. Does the continuous attack + damage dialog feel clearer and less click-heavy?
+5. Are movement/attack previews informative without becoming too visually noisy?
+6. Does the tactical AI make recognizably better choices, and do its logged reasons make sense?
+7. Is the end-of-encounter summary useful for diagnosing balance and play patterns?
+8. Do one-line hero identities make each role immediately understandable?
+9. Do equipment comparisons explain practical trade-offs better than raw stat deltas?
+10. Regression-test v0.12 movement, cover, Fortify, Brace, spell preparation, healing, critical defense, seeded maps, and deployment.
 
-- Deployment is formation-based and seeded, but it does not yet score every possible opening position for sophisticated tactical fairness.
-- Initiative remains logged rather than using the new action-resolution dice panel.
-- Movement-zone colors are prototype indicators and may change during UI refinement.
-- The browser prototype still prioritizes rules validation over final art, audio and animation polish.
+## Known / intentional prototype limitations
+- Opportunity Attack reactions still use provisional ordinary attack profiles rather than final class-specific reaction abilities.
+- Enemy AI is heuristic and deliberately transparent; it is a testing system, not final production AI.
+- End-of-encounter Tactical Notes are rule-based thresholds, not an AI strategy coach.
+- Mission objective remains elimination only.
+- Final art, animation, audio, controller input, save/load, campaign systems, richer objectives, and production presentation remain for the Godot phase.
