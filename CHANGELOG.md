@@ -1,6 +1,21 @@
 # Prototype Zero Changelog
 
-## v0.12 — current
+## v0.13 — current
+Focus: combat clarity, visible reactions, tactical AI, playtest telemetry, and preparation for the Godot transition.
+
+- Replaced generic Basic Attack action labels with equipped weapon attack names.
+- Added action-aware healing confirmation: Cast Healing Light with a blue support-action control.
+- Added one-reaction-per-round Opportunity Attacks for voluntary movement after entering adjacency.
+- Added Disengage, visible engagement/ZOC cues, provoking-step path warnings, and a consolidated pre-move reaction warning.
+- Expanded movement and attack previews so AP, remaining AP, terrain, engagement, reaction risk, roll mode/causes, cover and damage are visible before commitment.
+- Unified attack/defense/damage presentation so successful hits proceed automatically into damage inside the same dialog.
+- Standardized combat-resolution vocabulary and added a REACTION presentation for Opportunity Attacks.
+- Replaced simple enemy pursuit with a tactical heuristic scorer and combat-log AI reasoning.
+- Added an end-of-encounter statistical summary with per-character contributions and rules-based Tactical Notes.
+- Added one-line tactical identities to character sheet and battlefield inspection.
+- Expanded equipment and prepared-spell comparison to show changed values, gained/lost actions and practical tactical consequences.
+
+## v0.12
 Focus: seeded deployment, diminishing movement, persistent dice presentation, critical defenses, action-effect roll panels, and compact combat summaries.
 
 - Added seeded formation-based deployment for heroes and enemies with guarded formation patterns.
