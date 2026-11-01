@@ -8,10 +8,6 @@ on:
     paths:
       - "godot/**"
       - ".github/workflows/godot-windows.yml"
-  pull_request:
-    paths:
-      - "godot/**"
-      - ".github/workflows/godot-windows.yml"
   workflow_dispatch:
 
 permissions:
@@ -64,10 +60,10 @@ jobs:
           (cd build/windows && zip -q -9 -r ../PrototypeZero-Godot-Alpha-0.1-Windows.zip .)
           test -s build/PrototypeZero-Godot-Alpha-0.1-Windows.zip
 
-      - name: Upload Windows test ZIP
+      - name: Upload directly extractable Windows test build
         uses: actions/upload-artifact@v4
         with:
           name: PrototypeZero-Godot-Alpha-0.1-Windows
-          path: build/PrototypeZero-Godot-Alpha-0.1-Windows.zip
+          path: build/windows/
           retention-days: 30
           if-no-files-found: error
