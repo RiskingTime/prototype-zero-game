@@ -1,27 +1,12 @@
-# Prototype Zero — Godot Alpha 0.1 (engineering test)
+# Prototype Zero — Godot combat playtest
 
-This is a **pipeline test**, not the first official gameplay release. HTML v0.13 remains the reference for combat rules.
+This engineering build contains a Knight-versus-Sword Brute duel with placeholder graphics. HTML v0.13 is the rules reference.
 
-## Windows playtest steps
+1. Extract the Windows build ZIP and keep `PrototypeZero.exe` and `PrototypeZero.pck` together.
+2. Open `PrototypeZero.exe`. Verify that both combatants and their HP are visible.
+3. When the Knight is active, click an empty tile to move. The first movement AP covers up to three tiles. Each additional movement AP covers up to two.
+4. Click the Sword Brute from an adjacent tile to attack. Check the opposed rolls and remaining HP in the log.
+5. Click **End turn** to watch the Brute move or attack. A spent turn also advances automatically.
+6. Play to victory or defeat. Use **Restart duel** to play again, or press Esc to exit.
 
-1. Download the Windows build ZIP from the successful GitHub Actions run.
-2. Extract **all** files into a folder on your Windows PC. Do not run from inside the ZIP.
-3. Keep `PrototypeZero.exe` and `PrototypeZero.pck` together in the same folder.
-4. Double-click `PrototypeZero.exe`.
-5. Click different battlefield tiles. The blue placeholder moves to the chosen tile and the tile coordinates update.
-6. Press Esc to exit.
-
-## What success means
-
-- The game starts and shows a simple tilted, orthographic 3D battlefield.
-- Left-clicking a tile moves the blue placeholder to that tile.
-- The status text shows the selected cell.
-- The game exits normally using Esc.
-
-There are no attacks, action points, animations, pathfinding, AI, or save files in Alpha 0.1.
-
-## If it doesn't run
-
-Report your Windows version, any error message, whether the EXE and PCK are together, and the build SHA in `BUILD.txt`. Some unsigned early builds may show a Windows SmartScreen warning; confirm file origin before choosing whether to run it.
-
-Do not mark this as an official release until the Windows executable has been run successfully on a Windows computer and the release checklist has been completed.
+Include the commit in `BUILD.txt` when reporting issues. An official release requires a successful Windows playtest.
