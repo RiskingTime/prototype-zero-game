@@ -52,17 +52,19 @@ Stage branches are named `godot-stage-<N>-<topic>`, for example `godot-stage-0-w
 - Docs-only stages are reviewed against a written checklist.
 - Code stages: the reviewer drafts acceptance tests from the approved acceptance criteria and hands them to the writer. The writer commits them unmodified, and the reviewer confirms that at review.
 
-## Reports
+## Reports and handoffs
 
-Every stage report and every review uses this format:
+Every Prototype Zero response and update, whether to James or to the other agent (proposals, reports, reviews and status updates), is a self-contained handoff: someone with no earlier context must be able to act on it. Include:
 
 - **Status:** COMPLETE, PARTIAL or BLOCKED.
-- **Branch** and **full commit SHA**.
+- **James's approved work:** the stage and its approved scope, the writer and the reviewer, and which approvals are still pending (for example, merge or release).
+- **Branch**, **full commit SHA** and its parent.
 - **PR** and **CI** links, or "no CI run" with the reason.
-- **Checks actually run** vs. **checks not run**.
+- **Evidence:** checks actually run, with their results, vs. checks not run.
 - **Caveats.**
-- **Decision needed** from James, if any.
-- End with a short **"Paste into Codex"** (or **"Paste into Claude"**) block the other agent can act on.
+- **Open questions** and decisions needed from James.
+- **Action requested** of the receiving agent.
+- End with a short **"Paste into Codex"** (or **"Paste into Claude"**) block that carries the essentials above and asks the receiving agent to reply with its own paste block.
 
 ## Tests and CI
 

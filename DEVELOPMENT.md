@@ -2,7 +2,7 @@
 
 ## Shared workflow (read first)
 
-Before changing anything, read [`AGENTS.md`](./AGENTS.md). It is the canonical workflow for people and coding agents: roles, approval gates, branch naming, review of the exact commit, report format and test conventions. Claude Code loads it through [`CLAUDE.md`](./CLAUDE.md). If this file and `AGENTS.md` disagree, `AGENTS.md` wins.
+Before changing anything, read [`AGENTS.md`](./AGENTS.md). It is the canonical workflow for people and coding agents: roles, approval gates, branch naming, review of the exact commit, report and handoff format, and test conventions. Claude Code loads it through [`CLAUDE.md`](./CLAUDE.md). If this file and `AGENTS.md` disagree, `AGENTS.md` wins.
 
 ## Current phase
 
@@ -27,7 +27,7 @@ When a new Godot Windows build passes export in CI and is ready to test, email J
 **Body, in this order:**
 
 1. **Label.** First line: "Engineering test build, not an official release."
-2. **Download.** Put this near the top so it stands out. Give the direct ZIP link when available: the artifact link for that run, `https://github.com/RiskingTime/prototype-zero-game/actions/runs/<run-id>/artifacts/<artifact-id>`, which is shown on the run page and in the upload step's log. Say that downloading needs a free GitHub account and sign-in (the repository is public, so no other access is needed), and give the expiry date. Then give the Actions run page, `https://github.com/RiskingTime/prototype-zero-game/actions/runs/<run-id>`, as the fallback (download from its Artifacts section).
+2. **Download.** Put this near the top so it stands out. The default download is the exact artifact link for that run, `https://github.com/RiskingTime/prototype-zero-game/actions/runs/<run-id>/artifacts/<artifact-id>`, which is shown on the run page and in the upload step's log. Say that downloading needs a free GitHub account and sign-in (the repository is public, so no other access is needed), and give the expiry date. Then give the Actions run page, `https://github.com/RiskingTime/prototype-zero-game/actions/runs/<run-id>`, as the fallback (download from its Artifacts section).
 3. **Build.** Version as written in `BUILD.txt` (for example, `Godot Alpha 0.1`), the full commit SHA, the branch and the PR link.
 4. **What changed** since the last tested build, in a few bullets.
 5. **Extract and launch.**
@@ -36,11 +36,11 @@ When a new Godot Windows build passes export in CI and is ready to test, email J
    3. Right-click it and choose Extract All, into a new folder. Don't run the game from inside the ZIP.
    4. Keep `PrototypeZero.exe` and `PrototypeZero.pck` together in that folder.
    5. Open `BUILD.txt` and check that its commit matches the SHA in this email.
-   6. Double-click `PrototypeZero.exe`. If Windows SmartScreen warns about an unrecognized app, choose More info → Run anyway, but only for a ZIP downloaded from this email's link.
+   6. Double-click `PrototypeZero.exe`. If Windows SmartScreen or any other security warning appears, stop and don't bypass it. Reply with the exact warning text (a screenshot helps), and before going any further, confirm that the ZIP came from the Actions run named in this email and that the commit in `BUILD.txt` matches that run's commit.
 6. **Playtest.** The numbered checklist for this build, each step with its expected result. For Godot Alpha 0.1: click three different tiles and confirm that the pawn moves and the coordinates update each time, then press Esc and confirm the game exits.
 7. **Feedback.** Ask each tester to reply to all with pass or fail for each checklist step, the commit from `BUILD.txt`, their Windows version, the exact text of any warning or error (screenshots help), and anything that was confusing.
 
-**Attachment:** attach the ZIP when the mail service accepts a file that size (Gmail's limit is 25 MB). Otherwise, say in the email that the ZIP isn't attached and why.
+**No attachment:** don't attach the build. Gmail blocks ZIP files that contain an `.exe`, whatever their size, so the exact artifact link is the way to get the build.
 
 ## Source of truth
 
