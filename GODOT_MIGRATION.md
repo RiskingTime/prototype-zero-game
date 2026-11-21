@@ -8,6 +8,16 @@ We are building an **orthographic 3D battlefield with an isometric-style camera*
 
 This branch contains an Alpha 0.1 engineering test and an automated pipeline; it does **not** port the v0.13 combat systems.
 
+## Camera and art conventions
+
+Decided by James on November 21, 2026. Full record: Drive, Prototype Zero / Art / "Prototype Zero camera and art pipeline decision (2026-11-21)".
+
+- **Camera:** orthographic, 45° yaw, default pitch 30° (2:1 pixel isometric). True isometric (35.264°) and 45° will be player options, added in a later approved stage.
+- **November 28 playtest build:** fixed 30° camera with placeholder shapes. This is a temporary scope choice; the build has no pitch options or rotation.
+- **Grid and scale:** one cell is 1.0 world unit. At 30° and 1280×800, art is shown at 2×: a cell is 128×64 px and the orthographic size is about 8.84. The camera implementation stage confirms these values.
+- **Highlights:** selection, path and cursor highlights are drawn over units and cover.
+- **Art:** PixelLab output stays in Drive as candidate art until James and Jeremy approve it.
+
 ## Milestones
 
 1. Preserve the HTML v0.13 reference and agree on technical architecture.
