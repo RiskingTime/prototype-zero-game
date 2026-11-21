@@ -1,10 +1,45 @@
 # Development Workflow
 
+## Shared workflow (read first)
+
+Before changing anything, read [`AGENTS.md`](./AGENTS.md). It is the canonical workflow for people and coding agents: roles, approval gates, branch naming, review of the exact commit, report format and test conventions. Claude Code loads it through [`CLAUDE.md`](./CLAUDE.md). If this file and `AGENTS.md` disagree, `AGENTS.md` wins.
+
 ## Current phase
 
-Prototype Zero is in browser-based mechanics and UI validation.
+Prototype Zero is in the Godot phase. Active development happens in `godot/` on the `godot-alpha-0.1` integration branch; see [`GODOT_MIGRATION.md`](./GODOT_MIGRATION.md).
 
-HTML, CSS, and JavaScript are being used because they allow fast iteration on rules, interaction design, combat feedback, and debugging without committing to final art or engine architecture.
+Browser v0.13 (`index.html`, `history/`, `releases/`) is frozen as the rules reference and is no longer developed. The browser release process, browser-stage exit criteria and Godot transition notes below are kept as the record of the browser phase.
+
+## Godot playtest build email (engineering tests)
+
+When a new Godot Windows build passes export in CI and is ready for James to test, email James. This email announces an **engineering test build**. It can be sent before official release approval. It is not the release-completion email described below, which is sent only for an official release that James has approved.
+
+**From and to:** `james@markdalemanagement.com` → `james@markdalemanagement.com`. Whoever confirms the build is ready (normally the stage writer) sends it. If that agent can't send email, it puts the finished email text in its report for James.
+
+**Subject:** `[Engineering test] Prototype Zero Godot <version> — Windows build <7-character commit SHA>`
+
+**Before sending, check that:**
+
+- the GitHub Actions run succeeded, including the Windows export step;
+- the run's commit is the commit named in the email;
+- the download link belongs to that run, and the artifact hasn't expired (artifacts expire 30 days after the run).
+
+**Body, in this order:**
+
+1. **Label.** First line: "Engineering test build, not an official release."
+2. **Download.** Put this near the top so it stands out. Give the direct ZIP link when available: the artifact link for that run, `https://github.com/RiskingTime/prototype-zero-game/actions/runs/<run-id>/artifacts/<artifact-id>`, which is shown on the run page and in the upload step's log. Say that it needs a GitHub login, and give the expiry date. Then give the Actions run page, `https://github.com/RiskingTime/prototype-zero-game/actions/runs/<run-id>`, as the fallback (download from its Artifacts section).
+3. **Build.** Version as written in `BUILD.txt` (for example, `Godot Alpha 0.1`), the full commit SHA, the branch and the PR link.
+4. **What changed** since the last build James tested, in a few bullets.
+5. **Extract and launch.**
+   1. Download the ZIP from the link in this email.
+   2. Right-click it and choose Extract All, into a new folder. Don't run the game from inside the ZIP.
+   3. Keep `PrototypeZero.exe` and `PrototypeZero.pck` together in that folder.
+   4. Open `BUILD.txt` and check that its commit matches the SHA in this email.
+   5. Double-click `PrototypeZero.exe`. If Windows SmartScreen warns about an unrecognized app, choose More info → Run anyway, but only for a ZIP downloaded from this email's link.
+6. **Playtest.** The numbered checklist for this build, each step with its expected result. For Godot Alpha 0.1: click three different tiles and confirm that the pawn moves and the coordinates update each time, then press Esc and confirm the game exits.
+7. **Feedback.** Ask James to reply with pass or fail for each checklist step, the commit from `BUILD.txt`, his Windows version, the exact text of any warning or error (screenshots help), and anything that was confusing.
+
+**Attachment:** attach the ZIP when the mail service accepts a file that size (Gmail's limit is 25 MB). Otherwise, say in the email that the ZIP isn't attached and why.
 
 ## Source of truth
 
