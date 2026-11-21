@@ -35,13 +35,13 @@ Muse, Forms, Sheets and other automations never create GitHub issues.
 ## Stage lifecycle
 
 1. **Propose** one bounded stage: scope, out of scope, risks, tests and acceptance criteria. One proposal at a time.
-2. **Approve:** James approves the stage, assigns the writer, and names the branch and its base commit.
+2. **Approve:** James approves the stage, assigns the writer, and confirms the branch name and its base commit.
 3. **Implement** on the stage branch, starting from the approved base commit. Change only the files in scope.
 4. **Open a PR** into `godot-alpha-0.1` and post a report (format below).
 5. **Review:** the reviewer reviews the exact commit named in the report and returns a verdict with that full SHA.
 6. **Merge** only after James approves.
 
-Branch names start with `godot-`, because CI only runs on `main` and `godot-*` branches. James sets the exact name when approving a stage (Stage 0: `godot-stage-0-workflow`).
+Stage branches are named `godot-stage-<N>-<topic>`, for example `godot-stage-0-workflow`. Keep the `godot-` prefix: CI only runs on `main` and `godot-*` branches.
 
 ## Review rules
 
@@ -82,7 +82,7 @@ timeout 120 godot --headless --path godot --script res://tests/smoke_test.gd
 
 - **Engineering builds** are GitHub Actions artifacts. They are not releases.
 - **Official releases** need James's approval and follow the release definition of done in `GODOT_MIGRATION.md`. Google Drive archives approved official releases only.
-- **Playtest email:** when a Windows build passes export and is ready for James to test, email him as described in `DEVELOPMENT.md` ("Godot playtest build email"). It announces an engineering test, can be sent before official release approval, and is not a release-completion email.
+- **Playtest email:** when a Windows build passes export and is ready to test, email James and Jeremy as described in `DEVELOPMENT.md` ("Godot playtest build email"). It announces an engineering test, can be sent before official release approval, and is not a release-completion email.
 - **Human Windows check** for a build under test: extract the whole ZIP, launch `PrototypeZero.exe`, click three different tiles and confirm that the pawn moves and the coordinates update each time, then press Esc to exit. Record the result together with the SHA from `BUILD.txt`.
 
 ## Hard rules
