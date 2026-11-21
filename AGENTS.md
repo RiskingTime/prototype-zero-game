@@ -76,9 +76,10 @@ timeout 120 godot --headless --path godot --script res://tests/smoke_test.gd
 ```
 
 - Test scripts live in `godot/tests/`. They extend `SceneTree`, print a `... PASSED` line and call `quit(0)` on success, and `printerr` a `... FAILED: <reason>` line and call `quit(1)` on failure.
+- Name a new test script with the `_test.gd` suffix to include it in CI automatically.
 - Always run tests with a timeout. On Godot 4.7.2 a script runtime error or a missing `quit()` leaves Godot running instead of exiting.
 - CI (`.github/workflows/godot-windows.yml`) runs on pushes to `main` and `godot-*` **only when `godot/**` or the workflow file changes**, and on manual `workflow_dispatch`. It does not run on pull requests, so docs-only pushes get no CI run.
-- CI imports the project, runs `smoke_test.gd`, exports Windows, and uploads an artifact containing `PrototypeZero.exe`, `PrototypeZero.pck`, `README-PLAYTEST.md` and `BUILD.txt` (which records the commit SHA). Artifacts expire after 30 days.
+- CI imports the project, automatically runs every `godot/tests/*_test.gd` script, exports Windows, and uploads an artifact containing `PrototypeZero.exe`, `PrototypeZero.pck`, `README-PLAYTEST.md` and `BUILD.txt` (which records the commit SHA). Artifacts expire after 30 days.
 
 ## Builds and releases
 
