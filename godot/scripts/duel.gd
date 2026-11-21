@@ -65,7 +65,35 @@ func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
         get_tree().quit()
     elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-        play_cell(screen_to_cell(event.position))
+        _click_battlefield(event.position)
+
+
+func _click_battlefield(screen_position: Vector2) -> void:
+    var camera := get_camera()
+    var ray_origin := camera.project_ray_origin(screen_position)
+    var ray_direction := camera.project_ray_normal(screen_position)
+    var ray_end := ray_origin + ray_direction * (camera.far - camera.near)
+    var hit_knight := _ray_hits_capsule(_pawn, ray_origin, ray_end)
+    var hit_brute := _ray_hits_capsule(_foe, ray_origin, ray_end)
+
+    # Both capsules have the same size and stand on the same plane. When their
+    # projections overlap, the capsule closer along the view direction is in front.
+    if hit_brute and (not hit_knight or ray_direction.dot(
+            _foe.global_position - _pawn.global_position) < 0.0):
+        play_cell(battle.enemy.cell)
+    elif not hit_knight:
+        play_cell(screen_to_cell(screen_position))
+
+
+func _ray_hits_capsule(unit: MeshInstance3D, ray_origin: Vector3, ray_end: Vector3) -> bool:
+    var capsule := unit.mesh as CapsuleMesh
+    if capsule == null or not unit.is_visible_in_tree():
+        return false
+    # A capsule is the volume within its radius of this central segment.
+    var axis := Vector3.UP * (capsule.height * 0.5 - capsule.radius)
+    var closest := Geometry3D.get_closest_points_between_segments(
+        ray_origin, ray_end, unit.to_global(-axis), unit.to_global(axis))
+    return closest[0].distance_squared_to(closest[1]) <= capsule.radius * capsule.radius
 
 
 func play_cell(cell: Vector2i) -> void:

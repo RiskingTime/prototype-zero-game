@@ -39,13 +39,21 @@ func _verify() -> void:
     var hud_rect := duel._end_button.get_global_rect()
     _check(hud_rect.has_area() and root.get_visible_rect().encloses(hud_rect),
         "End turn control fits the viewport.")
-    _click(duel, battle.enemy.cell)
-    _check(battle.ap == 3, "Out-of-range attack leaves AP intact.")
+    var brute_chest := duel.cell_to_world(battle.enemy.cell) + Vector3.UP * 0.9
+    var start := battle.hero.cell
+    _click_world(duel, brute_chest)
+    _check(battle.ap == 3 and battle.hero.cell == start,
+        "Clicking the out-of-range Brute's chest cannot move the Knight.")
     _click(duel, Vector2i(6, 4))
     _check(battle.hero.cell == Vector2i(6, 4) and battle.ap == 2, "Three tiles cost one AP.")
     _check(battle.movement_cost(Vector2i(3, 4)) == 2, "Later movement grants two tiles per AP.")
-    _click(duel, battle.enemy.cell)
-    _check(battle.ap == 1, "Adjacent attack through viewport costs one AP.")
+    _click_world(duel, duel.cell_to_world(battle.hero.cell) + Vector3.UP * 0.9)
+    _check(battle.ap == 2 and battle.hero.cell == Vector2i(6, 4),
+        "Clicking the Knight's body cannot move the Knight.")
+    _click_world(duel, brute_chest)
+    _check(battle.ap == 1 and battle.hero.cell == Vector2i(6, 4)
+        and battle.log.back().begins_with("Longsword:"),
+        "Clicking the adjacent Brute's chest attacks without moving.")
 
     battle.active = battle.enemy
     battle._rng.seed = 112
@@ -76,8 +84,12 @@ func _verify() -> void:
 
 
 func _click(duel: Duel, cell: Vector2i) -> void:
+    _click_world(duel, duel.cell_to_world(cell))
+
+
+func _click_world(duel: Duel, position: Vector3) -> void:
     var event := InputEventMouseButton.new()
-    event.position = duel.get_camera().unproject_position(duel.cell_to_world(cell))
+    event.position = duel.get_camera().unproject_position(position)
     event.button_index = MOUSE_BUTTON_LEFT
     event.pressed = true
     root.push_input(event, true)
