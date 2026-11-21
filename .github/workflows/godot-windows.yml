@@ -46,6 +46,9 @@ jobs:
           set -euo pipefail
           godot --headless --path godot --script res://tests/smoke_test.gd
 
+      - name: Run camera acceptance test
+        run: timeout 120 godot --headless --path godot --script res://tests/camera_acceptance_test.gd
+
       - name: Export Windows game and package ZIP
         shell: bash
         run: |
