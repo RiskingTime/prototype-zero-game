@@ -1,15 +1,18 @@
 extends SceneTree
 
-# Stage 5 backdrop acceptance (encounter.tscn → encounter_backdrop.gd, a thin subclass of
-# encounter.gd): launch-argument parsing, the default tiled board, the opt-in
-# registration guide (BG_CANVAS, CanvasLayer -1, mouse-ignoring TextureRect), guide marks
-# against the live camera within one logical pixel, and pointer input in both modes at
-# three window sizes. Pointer events go through Viewport.push_input in window coordinates,
-# so the project's canvas_items/keep stretch is exercised for real.
+# Backdrop acceptance (encounter.tscn → encounter_backdrop.gd, a thin subclass of
+# encounter.gd): launch-argument parsing; the default Mossgate painting and the opt-in
+# registration guide (BG_CANVAS, CanvasLayer -1, mouse-ignoring TextureRect); the opt-in
+# tiled board; guide marks against the live camera within one logical pixel; and pointer
+# input in all three modes at three window sizes. Pointer events go through
+# Viewport.push_input in window coordinates, so the project's canvas_items/keep stretch is
+# exercised for real.
 
 const SCENE_PATH := "res://scenes/encounter.tscn"
 const ENCOUNTER_SCRIPT := "res://scripts/encounter_backdrop.gd"
 const MARKS_PATH := "res://assets/debug/registration_guide.json"
+const PAINTING_PATH := "res://assets/backdrops/mossgate_by_day_2560x1600.png"
+const GUIDE_PATH := "res://assets/debug/registration_guide.svg"
 const Rules = preload("res://scripts/encounter_rules.gd")
 const DEFAULT_BACKGROUND := Color(0.075, 0.10, 0.13)
 const WINDOW_SIZES := [Vector2i(1280, 800), Vector2i(1920, 1080), Vector2i(960, 600)]
@@ -94,82 +97,91 @@ func _push_click(p: Vector2) -> void:
 
 func _verify() -> void:
     _parsing()
-    await _default_mode()
-    await _guide_mode()
+    await _tiles_mode()
+    await _backdrop_mode("", "painting", PAINTING_PATH, "")
+    await _backdrop_mode("guide", "guide", GUIDE_PATH, " · Guide backdrop")
     await _registration()
-    for mode in ["default", "guide"]:
+    for mode in ["tiles", "painting", "guide"]:
         await _pointer(mode)
     if current_scene != null:
         current_scene.free()
     if _failures == 0:
-        print("ENCOUNTER BACKDROP TEST PASSED: argument parsing, default tiles, guide wiring and HUD, %d guide marks within 1 px, pointer input in both modes at %d window sizes." % [_mark_count, WINDOW_SIZES.size()])
+        print("ENCOUNTER BACKDROP TEST PASSED: argument parsing, painting (default), guide and tiles wiring and HUD, %d guide marks within 1 px, pointer input in all three modes at %d window sizes." % [_mark_count, WINDOW_SIZES.size()])
     quit(0 if _failures == 0 else 1)
 
 
-# 1. "--backdrop=guide" selects the guide from either argument list; anything else is default.
+# 1. "--backdrop=guide" or "--backdrop=tiles" selects that mode from either argument list;
+#    anything else is the painting.
 func _parsing() -> void:
     var script = load(ENCOUNTER_SCRIPT)
     var none := PackedStringArray()
-    _check(script.backdrop_mode_from_args(none, none) == "default", "No arguments → default.")
+    _check(script.backdrop_mode_from_args(none, none) == "painting", "No arguments → painting.")
     _check(script.backdrop_mode_from_args(PackedStringArray(["--backdrop=guide"]), none) == "guide", "User argument → guide.")
     _check(script.backdrop_mode_from_args(none, PackedStringArray(["--script", "x", "--backdrop=guide"])) == "guide", "Bare engine argument → guide.")
-    _check(script.backdrop_mode_from_args(PackedStringArray(["--backdrop=painting"]), PackedStringArray(["--backdrop"])) == "default", "Other values → default.")
+    _check(script.backdrop_mode_from_args(PackedStringArray(["--backdrop=tiles"]), none) == "tiles", "User argument → tiles.")
+    _check(script.backdrop_mode_from_args(none, PackedStringArray(["--backdrop=tiles"])) == "tiles", "Bare engine argument → tiles.")
+    _check(script.backdrop_mode_from_args(PackedStringArray(["--backdrop=painting"]), PackedStringArray(["--backdrop"])) == "painting", "Other values → painting.")
 
 
-# 2. A normal launch is the current tiled board: no backdrop nodes, same background, all tiles.
-func _default_mode() -> void:
-    var scene := await _open("", Vector2i(1280, 800))
-    _check(scene.backdrop_mode == "default", "An empty mode resolves to default under the test runner's arguments.")
+# 2. "--backdrop=tiles" is the original tiled board: no backdrop nodes, same background, all tiles.
+func _tiles_mode() -> void:
+    var scene := await _open("tiles", Vector2i(1280, 800))
     var environment := (scene.get_node("Environment") as WorldEnvironment).environment
-    _check(environment.background_mode == Environment.BG_COLOR, "Default mode keeps the colour background.")
-    _check(environment.background_color.is_equal_approx(DEFAULT_BACKGROUND), "Default background colour is unchanged.")
-    _check(scene.get_node_or_null("Backdrop") == null, "Default mode has no Backdrop layer.")
-    _check(scene.get_node_or_null("HUD/TurnOrderPanel") == null, "Default mode has no header panel.")
+    _check(environment.background_mode == Environment.BG_COLOR, "Tiles mode keeps the colour background.")
+    _check(environment.background_color.is_equal_approx(DEFAULT_BACKGROUND), "Tiles background colour is unchanged.")
+    _check(scene.get_node_or_null("Backdrop") == null, "Tiles mode has no Backdrop layer.")
+    _check(scene.get_node_or_null("HUD/TurnOrderPanel") == null, "Tiles mode has no header panel.")
     var tiles := _tiles(scene)
     _check(tiles.size() == 80, "80 tile meshes (got %d)." % tiles.size())
-    _check(tiles.all(func(t): return t.visible), "All tiles are visible in default mode.")
+    _check(tiles.all(func(t): return t.visible), "All tiles are visible in tiles mode.")
     var build := scene.get_node("HUD/TurnOrder/BuildSeed") as Label
-    _check(not build.text.contains("Guide"), "Default build line has no guide marker (got '%s')." % build.text)
+    _check(build.text.ends_with(" · Tiled board"), "Tiles build line ends with the marker (got '%s')." % build.text)
 
 
-# 3. Guide mode wiring: canvas background, layer -1 TextureRect over the logical canvas,
-#    tiles hidden, units and selection still drawn, header panel, build line marker.
-func _guide_mode() -> void:
-    var scene := await _open("guide", Vector2i(1280, 800))
+# 3. Backdrop wiring (painting by default, guide on request): canvas background, layer -1
+#    TextureRect over the logical canvas, tiles hidden, units and selection still drawn,
+#    header panel, build line marker.
+func _backdrop_mode(requested: String, expected: String, texture_path: String, suffix: String) -> void:
+    var scene := await _open(requested, Vector2i(1280, 800))
+    _check(scene.backdrop_mode == expected, "Requested '%s' resolves to %s (got %s)." % [requested, expected, scene.backdrop_mode])
     var environment := (scene.get_node("Environment") as WorldEnvironment).environment
-    _check(environment.background_mode == Environment.BG_CANVAS, "Guide mode uses BG_CANVAS.")
+    _check(environment.background_mode == Environment.BG_CANVAS, "%s mode uses BG_CANVAS." % expected)
     var layer := scene.get_node_or_null("Backdrop") as CanvasLayer
-    _check(layer != null, "Guide mode adds the Backdrop layer.")
+    _check(layer != null, "%s mode adds the Backdrop layer." % expected)
     if layer == null:
         return
     _check(layer.layer == -1 and layer.layer <= environment.background_canvas_max_layer, "Backdrop layer -1 is within the canvas background (max %d)." % environment.background_canvas_max_layer)
-    var art := layer.get_node_or_null("Guide") as TextureRect
-    _check(art != null and art.texture != null, "Guide TextureRect has a texture.")
+    var art := layer.get_node_or_null("Art") as TextureRect
+    _check(art != null and art.texture != null, "%s TextureRect has a texture." % expected)
     if art == null or art.texture == null:
         return
-    _check(art.texture.get_size() == Vector2(2560, 1600), "Guide texture is 2560x1600 (got %s)." % art.texture.get_size())
-    _check(art.get_global_rect().is_equal_approx(Rect2(0, 0, 1280, 800)), "Guide covers the 1280x800 logical canvas (got %s)." % art.get_global_rect())
-    _check(art.stretch_mode == TextureRect.STRETCH_SCALE and art.expand_mode == TextureRect.EXPAND_IGNORE_SIZE, "Guide is scaled to its rect.")
-    _check(art.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Guide ignores the mouse.")
-    _check(art.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS and art.texture.get_image().has_mipmaps(), "Guide is drawn with mipmaps.")
+    _check(art.texture.resource_path == texture_path, "%s uses %s (got %s)." % [expected, texture_path, art.texture.resource_path])
+    _check(art.texture.get_size() == Vector2(2560, 1600), "%s texture is 2560x1600 (got %s)." % [expected, art.texture.get_size()])
+    _check(art.get_global_rect().is_equal_approx(Rect2(0, 0, 1280, 800)), "%s covers the 1280x800 logical canvas (got %s)." % [expected, art.get_global_rect()])
+    _check(art.stretch_mode == TextureRect.STRETCH_SCALE and art.expand_mode == TextureRect.EXPAND_IGNORE_SIZE, "%s is scaled to its rect." % expected)
+    _check(art.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s ignores the mouse." % expected)
+    _check(art.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS and art.texture.get_image().has_mipmaps(), "%s is drawn with mipmaps." % expected)
     var tiles := _tiles(scene)
-    _check(tiles.size() == 80 and tiles.all(func(t): return not t.visible), "All tiles are hidden in guide mode.")
+    _check(tiles.size() == 80 and tiles.all(func(t): return not t.visible), "All tiles are hidden in %s mode." % expected)
     for who in scene.battle.units:
-        _check(scene.unit_node(who.id).visible, "%s is visible over the guide." % who.name)
+        _check(scene.unit_node(who.id).visible, "%s is visible over the %s." % [who.name, expected])
     _check(scene.get_node("SelectedTile").visible, "The active unit's selection outline is visible.")
     var header := scene.get_node("HUD/TurnOrder") as Control
     var backing := scene.get_node_or_null("HUD/TurnOrderPanel") as Panel
-    _check(backing != null and backing.visible, "Guide mode backs the header with a panel.")
+    _check(backing != null and backing.visible, "%s mode backs the header with a panel." % expected)
     if backing != null:
         _check(backing.get_index() < header.get_index(), "The header panel is drawn behind the header text.")
         _check(backing.mouse_filter == Control.MOUSE_FILTER_IGNORE, "The header panel passes the mouse through, like the header.")
         for label in header.get_children():
             _check(backing.get_global_rect().encloses((label as Control).get_global_rect()), "The header panel encloses %s." % label.name)
     var build := scene.get_node("HUD/TurnOrder/BuildSeed") as Label
-    _check(build.text.ends_with(" · Guide backdrop"), "Guide build line ends with the marker (got '%s')." % build.text)
+    if suffix.is_empty():
+        _check(not build.text.contains("Guide") and not build.text.contains("Tiled"), "%s build line has no mode marker (got '%s')." % [expected, build.text])
+    else:
+        _check(build.text.ends_with(suffix), "%s build line ends with '%s' (got '%s')." % [expected, suffix, build.text])
     var font := build.get_theme_font("font")
     var width := font.get_string_size(build.text, HORIZONTAL_ALIGNMENT_LEFT, -1, build.get_theme_font_size("font_size")).x
-    _check(width <= build.size.x, "The guide build line fits its label (%.0f of %.0f px)." % [width, build.size.x])
+    _check(width <= build.size.x, "The %s build line fits its label (%.0f of %.0f px)." % [expected, width, build.size.x])
 
 
 # 4. Every guide mark matches the live camera within one logical pixel.
@@ -193,7 +205,7 @@ func _registration() -> void:
     _check(_mark_count >= 93, "All vertex, centre, cell and spawn marks are present (%d)." % _mark_count)
 
 
-# 5. Hover and clicks reach the battlefield in both modes at every window size.
+# 5. Hover and clicks reach the battlefield in every mode at every window size.
 func _pointer(mode: String) -> void:
     var seed := _hero_first_seed()
     for window in WINDOW_SIZES:

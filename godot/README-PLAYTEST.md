@@ -12,13 +12,23 @@ This engineering build contains the first 4-vs-4 battle with placeholder graphic
 
 When reporting an issue, include a screenshot showing the seed and build line. An official release requires a successful Windows playtest.
 
-## Guide backdrop (development view)
+Known issues in this build (Mossgate painting):
 
-The same build can show the battle over the Mossgate registration guide instead of the tiles. This view is for checking how painted scenery lines up with the board; a normal double-click always opens the tiled board.
+- The amber 2 AP movement highlight is faint on the sunlit grass. Green (1 AP) and red (3 AP) are clear; hover over a tile to see its exact AP cost in the preview line.
+- The gate in the painting is mostly hidden behind the Enemies panel at the top right.
+
+## Battlefield views
+
+A normal launch shows the battle over the Mossgate painting. Two development views are available in the same build:
+
+- **Registration guide** (`--backdrop=guide`): shows how the board lines up with painted scenery. The build line ends with `· Guide backdrop`.
+- **Tiled board** (`--backdrop=tiles`): the original tiles, without the painting. The build line ends with `· Tiled board`.
+
+To open one:
 
 1. Open the extracted folder.
 2. Right-click an empty area and choose **Open in Terminal**. On Windows 10, hold Shift, right-click and choose **Open PowerShell window here**.
-3. Run `.\PrototypeZero.exe --backdrop=guide`, then select **New Game** at the gate.
-4. The tiles are replaced by the guide, and the build line ends with `· Guide backdrop`, for example `Seed 123456 · Build 1a2b3c4 · Guide backdrop`. Include that line in screenshots.
+3. Run `.\PrototypeZero.exe --backdrop=guide` (or `--backdrop=tiles`), then select **New Game** at the gate.
+4. Include the build line in screenshots.
 
-To launch it by double-clicking instead, create a shortcut to `PrototypeZero.exe` and add ` --backdrop=guide` to the end of the shortcut's **Target**.
+To launch a view by double-clicking instead, create a shortcut to `PrototypeZero.exe` and add ` --backdrop=guide` or ` --backdrop=tiles` to the end of the shortcut's **Target**.
