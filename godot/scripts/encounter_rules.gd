@@ -57,6 +57,9 @@ var units: Array[Unit] = []
 var outcome := ""
 var log: Array[String] = []
 var last_error := ""
+# The latest successful action ({"actor", "target", "id", "count"}), for presentation only
+# (unit facing). It never affects rules.
+var last_action := {}
 
 var _grid_size: Vector2i
 var _turn_index := 0
@@ -74,6 +77,7 @@ func _init(grid_size: Vector2i) -> void:
 # same actions reproduce the same battle.
 func start(battle_seed: int) -> void:
     seed = battle_seed
+    last_action = {}
     _rng.seed = battle_seed
     units.clear()
     # Fixed deployment, mirrored through the board centre so no unit stands directly behind
@@ -449,6 +453,7 @@ func use_action(id: String, target: Unit) -> bool:
         _heal(chosen, target)
     else:
         _resolve_opposed(id, chosen, target)
+    last_action = {"actor": active.id, "target": target.id, "id": id, "count": int(last_action.get("count", 0)) + 1}
     _check_outcome()
     return true
 
