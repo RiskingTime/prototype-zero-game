@@ -21,10 +21,10 @@ func _verify() -> void:
     _check(not Rules.attack_hits(12, 14, 6, 4), "Tied totals favor the defender.")
     _check(Rules.attack_hits(20, 19, 0, 99), "Natural 20 attack hits normal defense.")
 
-    var scene_path := ProjectSettings.get_setting("application/run/main_scene") as String
-    var scene := load(scene_path) as PackedScene
+    # Stage 3 made the 4-vs-4 encounter the main scene; the duel scene is still kept and tested.
+    var scene := load("res://scenes/duel.tscn") as PackedScene
     var duel := scene.instantiate() as Duel
-    _check(duel != null, "Project launches the duel scene.")
+    _check(duel != null, "The duel scene loads.")
     if duel == null:
         quit(1)
         return
