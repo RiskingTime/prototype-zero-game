@@ -75,7 +75,10 @@ func _ready() -> void:
 
 func new_battle(battle_seed := -1) -> void:
     if battle_seed < 0:
+        # A new battle never repeats the current seed.
         battle_seed = _seed_rng.randi_range(1, 999999)
+        while battle_seed == battle.seed:
+            battle_seed = _seed_rng.randi_range(1, 999999)
     _start(battle_seed)
 
 
@@ -162,9 +165,9 @@ func preview_for(cell: Vector2i) -> String:
             chosen["name"], target.name, chosen["ap"],
             EncounterRules.ability_mod(actor.stats["int"]), hp_text]
     var modes: Dictionary = battle.roll_modes(actor, target, selected_action_id)
-    var mode_text := "normal"
+    var mode_text := "normal roll"
     if modes["attack"] != "normal":
-        mode_text = "%s (%s)" % [modes["attack"].capitalize(), ", ".join(modes["reasons"])]
+        mode_text = "%s (%s)" % [modes["attack"].capitalize(), "; ".join(modes["reasons"])]
     var defense_name := "MR" if chosen["type"] == "magic" else "AC"
     var effect := ""
     match chosen["kind"]:
@@ -174,10 +177,10 @@ func preview_for(cell: Vector2i) -> String:
             effect = "push %d, 1d6 on collision" % chosen["push"]
         "slow":
             effect = "Slowed for its next turn"
-    return "%s → %s · %d AP · %.1f%% hit (%+d vs %s %+d, %s) · %s · %s" % [
+    return "%s → %s · %d AP · %.1f%% to hit · %s · %s · %+d vs %s %+d · %s" % [
         chosen["name"], target.name, chosen["ap"], battle.hit_chance(actor, target, selected_action_id),
-        battle.attack_bonus(actor, selected_action_id), defense_name,
-        battle.defense_for(target, chosen["type"]), mode_text, effect, hp_text]
+        mode_text, effect, battle.attack_bonus(actor, selected_action_id), defense_name,
+        battle.defense_for(target, chosen["type"]), hp_text]
 
 
 # --- Battle flow -----------------------------------------------------------------------
@@ -383,7 +386,7 @@ func _refresh_board() -> void:
 func _build_theme() -> Theme:
     var result := Theme.new()
     result.set_font_size("font_size", "Label", 15)
-    result.set_font_size("font_size", "Button", 15)
+    result.set_font_size("font_size", "Button", 14)
     var panel := StyleBoxFlat.new()
     panel.bg_color = Color(0.06, 0.08, 0.1, 0.92)
     panel.border_color = Color(0.25, 0.32, 0.36)
@@ -405,10 +408,10 @@ func _build_theme() -> Theme:
         box.border_color = states[state][1]
         box.set_border_width_all(2 if state != "focus" else 1)
         box.set_corner_radius_all(5)
-        box.content_margin_left = 12
-        box.content_margin_right = 12
-        box.content_margin_top = 4
-        box.content_margin_bottom = 4
+        box.content_margin_left = 10
+        box.content_margin_right = 10
+        box.content_margin_top = 3
+        box.content_margin_bottom = 3
         result.set_stylebox(state, "Button", box)
     result.set_color("font_disabled_color", "Button", Color(0.45, 0.48, 0.5))
     result.set_color("font_pressed_color", "Button", Color(1, 1, 1))
@@ -468,52 +471,52 @@ func _build_encounter_hud() -> void:
     _build_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     _build_label.custom_minimum_size = Vector2(680, 0)
 
+    # Bottom panel: one row of controls, then the preview and the latest log entry, each
+    # across the full width so a long preview (several threats) stays readable.
     var bottom := _panel(hud)
     bottom.name = "BottomPanel"
     bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
     bottom.offset_left = 12
     bottom.offset_right = -12
-    bottom.offset_top = -106
+    bottom.offset_top = -100
     bottom.offset_bottom = -8
-    var columns := HBoxContainer.new()
-    columns.add_theme_constant_override("separation", 14)
-    bottom.add_child(columns)
+    var rows := VBoxContainer.new()
+    rows.add_theme_constant_override("separation", 5)
+    bottom.add_child(rows)
 
-    var left := VBoxContainer.new()
-    left.custom_minimum_size = Vector2(630, 0)
-    left.add_theme_constant_override("separation", 4)
-    columns.add_child(left)
-    _active_label = _label(left, 15, ACTIVE_TEXT)
+    var controls := HBoxContainer.new()
+    controls.add_theme_constant_override("separation", 6)
+    rows.add_child(controls)
+    _active_label = _label(controls, 15, ACTIVE_TEXT)
+    _active_label.name = "Active"
+    _active_label.custom_minimum_size = Vector2(150, 0)
+    _active_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     _action_bar = HBoxContainer.new()
+    _action_bar.name = "Actions"
     _action_bar.add_theme_constant_override("separation", 6)
-    left.add_child(_action_bar)
-    _preview_label = _label(left, 13)
+    controls.add_child(_action_bar)
+    var spacer := Control.new()
+    spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    controls.add_child(spacer)
+    _end_button = _button(controls, "End turn", end_player_turn)
+    _end_button.name = "EndTurn"
+    var restart := _button(controls, "Restart (same seed)", restart_same_seed)
+    restart.name = "Restart"
+    var fresh := _button(controls, "New battle", func() -> void: new_battle())
+    fresh.name = "NewBattle"
+
+    _preview_label = _label(rows, 14)
     _preview_label.name = "Preview"
-    _preview_label.custom_minimum_size = Vector2(630, 0)
+    _preview_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     _preview_label.clip_text = true
     _preview_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
-    _log_label = _label(columns, 12, Color(0.74, 0.78, 0.8))
+    _log_label = _label(rows, 13, Color(0.74, 0.78, 0.8))
     _log_label.name = "Log"
     _log_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    _log_label.custom_minimum_size = Vector2(250, 84)
-    _log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _log_label.clip_text = true
-    _log_label.max_lines_visible = 5
-
-    var buttons := VBoxContainer.new()
-    buttons.add_theme_constant_override("separation", 6)
-    columns.add_child(buttons)
-    _end_button = _button(buttons, "End turn", end_player_turn)
-    _end_button.name = "EndTurn"
-    _end_button.custom_minimum_size = Vector2(0, 34)
-    var restarts := HBoxContainer.new()
-    restarts.add_theme_constant_override("separation", 6)
-    buttons.add_child(restarts)
-    var restart := _button(restarts, "Restart (same seed)", restart_same_seed)
-    restart.name = "Restart"
-    var fresh := _button(restarts, "New battle", func() -> void: new_battle())
-    fresh.name = "NewBattle"
+    _log_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 
 func _button(parent: Node, text: String, callback: Callable) -> Button:
@@ -550,7 +553,8 @@ func _refresh_hud() -> void:
     var names: Array[String] = []
     for who in battle.order:
         if who.alive():
-            names.append(("[%s]" if who == battle.active else "%s") % who.name)
+            var entry := "%s %d/%d" % [who.name, who.hp, who.max_hp]
+            names.append("[%s]" % entry if who == battle.active else entry)
     if battle.outcome.is_empty():
         _round_label.text = "Round %d turn order: %s" % [battle.round_number, " › ".join(names)]
         _round_label.add_theme_font_size_override("font_size", 14)
@@ -567,16 +571,14 @@ func _refresh_hud() -> void:
     if not battle.outcome.is_empty():
         _active_label.text = "%s. Restart with the same seed or start a new battle." % battle.outcome
     elif _hero_turn():
-        _active_label.text = "%s's turn · %d/3 AP%s · click a target or a tile" % [
+        _active_label.text = "%s · %d/3 AP%s" % [
             actor.name, actor.ap, " · Slowed" if battle.is_slowed(actor) else ""]
     else:
         _active_label.text = "%s is acting…" % actor.name
     _end_button.disabled = not _hero_turn()
 
-    # Newest entry first, so the latest result is always visible.
-    var recent := battle.log.slice(-3)
-    recent.reverse()
-    _log_label.text = "\n".join(recent)
+    # The latest result; the side panels and turn order show the rest of the state.
+    _log_label.text = battle.log.back() if not battle.log.is_empty() else ""
 
 
 # Rebuilds the action buttons only when the acting hero changes, so a button is never
