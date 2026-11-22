@@ -1,14 +1,25 @@
 extends "res://scripts/encounter.gd"
 
-# Stage 5: opt-in painted backdrop for the encounter. "--backdrop=guide" on the command
-# line draws the registration guide behind the board as the environment's 2D canvas
+# Painted backdrops for the encounter, drawn behind the board as the environment's 2D canvas
 # background, so the 3D camera, the art and the pointer share one 1280x800 logical canvas.
-# A normal launch keeps the tiled board exactly as before; encounter.gd is unchanged.
+# A normal launch shows the approved Mossgate painting. "--backdrop=guide" shows the
+# registration guide and "--backdrop=tiles" shows the original tiled board instead.
+# encounter.gd is unchanged.
 
-const BACKDROP_DEFAULT := "default"
+const BACKDROP_PAINTING := "painting"
 const BACKDROP_GUIDE := "guide"
+const BACKDROP_TILES := "tiles"
 const BACKDROP_GUIDE_ARGUMENT := "--backdrop=guide"
-const BACKDROP_GUIDE_TEXTURE := "res://assets/debug/registration_guide.svg"
+const BACKDROP_TILES_ARGUMENT := "--backdrop=tiles"
+const BACKDROP_TEXTURES := {
+    BACKDROP_PAINTING: "res://assets/backdrops/mossgate_by_day_2560x1600.png",
+    BACKDROP_GUIDE: "res://assets/debug/registration_guide.svg",
+}
+const BACKDROP_BUILD_SUFFIX := {
+    BACKDROP_PAINTING: "",
+    BACKDROP_GUIDE: " · Guide backdrop",
+    BACKDROP_TILES: " · Tiled board",
+}
 const BACKDROP_RECT := Rect2(0, 0, 1280, 800)
 const BACKDROP_LAYER := -1
 
@@ -20,28 +31,29 @@ func _ready() -> void:
     if backdrop_mode.is_empty():
         backdrop_mode = backdrop_mode_from_args(OS.get_cmdline_user_args(), OS.get_cmdline_args())
     super._ready()
-    if backdrop_mode == BACKDROP_GUIDE:
-        _apply_guide_backdrop()
+    if BACKDROP_TEXTURES.has(backdrop_mode):
+        _apply_backdrop(BACKDROP_TEXTURES[backdrop_mode])
 
 
-# The guide is used only when "--backdrop=guide" is passed, either after "--" / "++"
-# (user arguments) or on its own (engine arguments). Anything else keeps the tiles.
+# "--backdrop=guide" or "--backdrop=tiles" may be passed after "--" / "++" (user arguments)
+# or on its own (engine arguments). Anything else shows the painting.
 static func backdrop_mode_from_args(user_args: PackedStringArray, engine_args: PackedStringArray) -> String:
     if user_args.has(BACKDROP_GUIDE_ARGUMENT) or engine_args.has(BACKDROP_GUIDE_ARGUMENT):
         return BACKDROP_GUIDE
-    return BACKDROP_DEFAULT
+    if user_args.has(BACKDROP_TILES_ARGUMENT) or engine_args.has(BACKDROP_TILES_ARGUMENT):
+        return BACKDROP_TILES
+    return BACKDROP_PAINTING
 
 
 func _refresh_hud() -> void:
     super._refresh_hud()
-    if backdrop_mode == BACKDROP_GUIDE:
-        _build_label.text += " · Guide backdrop"
+    _build_label.text += BACKDROP_BUILD_SUFFIX.get(backdrop_mode, "")
 
 
-# Draws the guide as the canvas background (layers up to -1), hides the tile meshes and
-# backs the turn-order header with a panel so it stays readable over the art. The guide
-# never takes mouse input, so hover and clicks still reach the battlefield.
-func _apply_guide_backdrop() -> void:
+# Draws the art as the canvas background (layers up to -1), hides the tile meshes and backs
+# the turn-order header with a panel so it stays readable over the art. The art never takes
+# mouse input, so hover and clicks still reach the battlefield.
+func _apply_backdrop(texture_path: String) -> void:
     var environment := ($Environment as WorldEnvironment).environment
     environment.background_mode = Environment.BG_CANVAS
     environment.background_canvas_max_layer = BACKDROP_LAYER
@@ -51,8 +63,8 @@ func _apply_guide_backdrop() -> void:
     layer.layer = BACKDROP_LAYER
     add_child(layer)
     var art := TextureRect.new()
-    art.name = "Guide"
-    art.texture = load(BACKDROP_GUIDE_TEXTURE)
+    art.name = "Art"
+    art.texture = load(texture_path)
     art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     art.stretch_mode = TextureRect.STRETCH_SCALE
     art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
