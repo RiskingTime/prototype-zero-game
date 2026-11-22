@@ -1,6 +1,6 @@
 # Prototype Zero — Godot 4-vs-4 encounter playtest
 
-This engineering build contains the first 4-vs-4 battle with placeholder graphics: Knight, Archer, Wizard and Cleric against a Sword Brute, Light Melee, Bowman and Enemy Mage. HTML v0.13 is the rules reference.
+This engineering build contains the first 4-vs-4 battle: Knight, Archer, Wizard and Cleric against a Sword Brute, Light Melee, Bowman and Enemy Mage. The units use candidate character art that is not yet approved. The panels keep the combat names, so the Ogre is the Sword Brute, the Rampart Sentry is the Light Melee and the Ash Examiner is the Enemy Mage. HTML v0.13 is the rules reference.
 
 1. Extract the Windows build ZIP and keep `PrototypeZero.exe`, `PrototypeZero.pck` and `BUILD.txt` together.
 2. Open `PrototypeZero.exe` and select **New Game** at the gate. Check that the build and seed appear under the turn order at the top, for example `Seed 123456 · Build 1a2b3c4`.
@@ -11,11 +11,6 @@ This engineering build contains the first 4-vs-4 battle with placeholder graphic
 7. Play to victory or defeat. **Restart (same seed)** replays the same battle; **New battle** picks a new seed. Esc quits.
 
 When reporting an issue, include a screenshot showing the seed and build line. An official release requires a successful Windows playtest.
-
-Known issues in this build (Mossgate painting):
-
-- The amber 2 AP movement highlight is faint on the sunlit grass. Green (1 AP) and red (3 AP) are clear; hover over a tile to see its exact AP cost in the preview line.
-- The gate in the painting is mostly hidden behind the Enemies panel at the top right.
 
 ## Battlefield views
 
