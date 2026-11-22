@@ -11,3 +11,14 @@ This engineering build contains the first 4-vs-4 battle with placeholder graphic
 7. Play to victory or defeat. **Restart (same seed)** replays the same battle; **New battle** picks a new seed. Esc quits.
 
 When reporting an issue, include a screenshot showing the seed and build line. An official release requires a successful Windows playtest.
+
+## Guide backdrop (development view)
+
+The same build can show the battle over the Mossgate registration guide instead of the tiles. This view is for checking how painted scenery lines up with the board; a normal double-click always opens the tiled board.
+
+1. Open the extracted folder.
+2. Right-click an empty area and choose **Open in Terminal**. On Windows 10, hold Shift, right-click and choose **Open PowerShell window here**.
+3. Run `.\PrototypeZero.exe --backdrop=guide`, then select **New Game** at the gate.
+4. The tiles are replaced by the guide, and the build line ends with `· Guide backdrop`, for example `Seed 123456 · Build 1a2b3c4 · Guide backdrop`. Include that line in screenshots.
+
+To launch it by double-clicking instead, create a shortcut to `PrototypeZero.exe` and add ` --backdrop=guide` to the end of the shortcut's **Target**.
