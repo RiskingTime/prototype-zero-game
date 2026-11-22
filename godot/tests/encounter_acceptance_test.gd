@@ -69,7 +69,17 @@ func _run() -> void:
         quit(1)
         return
     rules_script = load(RULES_PATH)
-    check(ProjectSettings.get_setting("application/run/main_scene") == SCENE_PATH, "Launch encounter.tscn")
+    change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
+    await scene_changed
+    var new_game := current_scene.get_node_or_null("Artwork/NewGame") as Button
+    if new_game == null:
+        printerr("ENCOUNTER ACCEPTANCE FAILED: New Game missing from opening menu.")
+        quit(1)
+        return
+    new_game.pressed.emit()
+    await scene_changed
+    check(current_scene.scene_file_path == SCENE_PATH, "New Game launches encounter.tscn")
+    unload_current_scene()
     roster_and_turns()
     movement()
     combat()
