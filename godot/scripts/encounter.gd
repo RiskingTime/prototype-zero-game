@@ -4,6 +4,7 @@ extends "res://scripts/battlefield.gd"
 # Rules live in encounter_rules.gd; this script handles the board, input and HUD.
 
 const EncounterRules = preload("res://scripts/encounter_rules.gd")
+const REACH_SHADER := preload("res://shaders/reach_cell.gdshader")
 const ENEMY_STEP_SECONDS := 0.55
 # Reachable-tile colours from the browser build (.cell.move1/2/3 in v0.13).
 const MOVE_COLOURS := {1: Color("#4d8a61"), 2: Color("#b08a43"), 3: Color("#a45e46")}
@@ -342,10 +343,9 @@ func _tile_fill(color: Color) -> MeshInstance3D:
     var plane := PlaneMesh.new()
     plane.size = Vector2(CELL_SPACING - 0.12, CELL_SPACING - 0.12)
     fill.mesh = plane
-    var material := StandardMaterial3D.new()
-    material.albedo_color = Color(color, 0.5)
-    material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    var material := ShaderMaterial.new()
+    material.shader = REACH_SHADER
+    material.set_shader_parameter("ap_color", color)
     fill.material_override = material
     return fill
 

@@ -12,11 +12,6 @@ This engineering build contains the first 4-vs-4 battle: Knight, Archer, Wizard 
 
 When reporting an issue, include a screenshot showing the seed and build line. An official release requires a successful Windows playtest.
 
-Known issues in this build (Mossgate painting):
-
-- The amber 2 AP movement highlight is faint on the sunlit grass. Green (1 AP) and red (3 AP) are clear; hover over a tile to see its exact AP cost in the preview line.
-- The gate in the painting is mostly hidden behind the Enemies panel at the top right.
-
 ## Battlefield views
 
 A normal launch shows the battle over the Mossgate painting. Two development views are available in the same build:

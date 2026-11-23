@@ -396,6 +396,18 @@ func scene_checks() -> void:
         check(node is Node3D and node.is_visible_in_tree(), "Visible unit " + id)
     var start := snapshot(r)
     check(scene.reachable_overlay() == r.reachable(a) and not r.reachable(a).is_empty(), "Reachable overlay")
+    await process_frame
+    var drawn := {}
+    for fill in scene.get_node("ReachOverlay").get_children():
+        var cell: Vector2i = scene.screen_to_cell(scene.get_viewport().get_camera_3d().unproject_position(fill.global_position))
+        var cost: int = scene.reachable_overlay().get(cell, 0)
+        check(cost > 0 and r.unit_at(cell) == null, "Reach fill on an empty reachable cell")
+        var material := fill.material_override as ShaderMaterial
+        check(material != null and material.shader == scene.REACH_SHADER, "Reach fill uses the rim shader")
+        if cost > 0 and material != null:
+            check(material.get_shader_parameter("ap_color") == scene.MOVE_COLOURS[cost], "Correct reach colour")
+        drawn[cell] = cost
+    check(drawn == scene.reachable_overlay(), "Every reachable cell has a cost highlight")
     check(scene.select_action("basic"), "Select longbow")
     var preview := str(scene.preview_for(b.cell)).to_lower()
     var chance := "%.1f" % r.hit_chance(a,b,"basic")
